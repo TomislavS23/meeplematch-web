@@ -10,19 +10,15 @@ public class HomeController : Controller
 
     public HomeController(ILogger<HomeController> logger)
     {
-        // test
         _logger = logger;
     }
 
     public IActionResult Index()
     {
-        // test
         return View();
     }
     public IActionResult About()
     {
-        // test - test 2git status
-        ViewData["Message"] = "Your application description page.";
         return View();
     }
 
