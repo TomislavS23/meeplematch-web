@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -8,34 +8,24 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Content Remove="wwwroot\assets\catan.png" />
-      <Content Remove="wwwroot\assets\codenames.png" />
-      <Content Remove="wwwroot\assets\dnd.png" />
-      <Content Remove="wwwroot\assets\dnd2.png" />
-      <Content Remove="wwwroot\assets\exploding_kittens.png" />
-      <Content Remove="wwwroot\assets\game1.png" />
-      <Content Remove="wwwroot\assets\game2.png" />
-      <Content Remove="wwwroot\assets\logo_without_title.png" />
-      <Content Remove="wwwroot\assets\ticket_to_ride.png" />
-      <Content Remove="wwwroot\assets\uno.png" />
+      <PackageReference Include="AutoMapper" Version="14.0.0" />
+      <PackageReference Include="DotNetEnv" Version="3.1.1" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.3">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     </ItemGroup>
 
     <ItemGroup>
-      <Resource Include="wwwroot\assets\images\catan.png" />
-      <Resource Include="wwwroot\assets\images\codenames.png" />
-      <Resource Include="wwwroot\assets\images\dnd.png" />
-      <Resource Include="wwwroot\assets\images\dnd2.png" />
-      <Resource Include="wwwroot\assets\images\exploding_kittens.png" />
-      <Resource Include="wwwroot\assets\images\game2.png" />
-      <Resource Include="wwwroot\assets\images\logo_without_title.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="wwwroot\assets\images\ticket_to_ride.png" />
-      <Resource Include="wwwroot\assets\images\uno.png" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="wwwroot\assets\videos\" />
+      <Reference Include="meeplematch-api">
+        <HintPath>..\..\meeplematch-api\meeplematch-api\bin\Debug\net8.0\meeplematch-api.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
