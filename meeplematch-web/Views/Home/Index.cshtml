@@ -2,7 +2,309 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="bg-video-wrapper" data-aos="fade-up" data-aos-duration="1000">
+    <video autoplay muted loop playsinline
+           style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
+        <source src="@Url.Content("~/assets/videos/home_page_video.mp4")" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="overlay"></div>
+
+    <div class="meeplematch-title text-center">
+        <h1 class="display-4 text-white fw-bold">MeepleMatch</h1>
+    </div>
+
+    <h1>
+        <span id="typewriter"></span>
+        <span id="cursor">|</span>
+    </h1>
+
+    <div class="cta-btn">
+        <a href="#" class="btn btn-primary btn-md px-4 py-2">Create Your <br> Own Events</a>
+    </div>
 </div>
+
+<div class="bg-dark py-5" data-aos="fade-up" data-aos-duration="1000">
+    <div class="container">
+        <h2 class="fw-bold text-white mb-3">What Do You Like to Play?</h2>
+        <p class="text-secondary mb-4">Explore events by game type – here are some popular picks.</p>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">Strategy Games</h5>
+                        <p class="card-text small">Plan, build, and trade your way to victory!</p>
+                        <p class="fw-bold mb-0">Popular: Catan</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">Party Games</h5>
+                        <p class="card-text small">Fun, loud, and perfect for big groups and laughs.</p>
+                        <p class="fw-bold mb-0">Popular: Codenames</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">Family Games</h5>
+                        <p class="card-text small">Easy rules, colorful boards, and fun for all ages.</p>
+                        <p class="fw-bold mb-0">Popular: Ticket to Ride</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">RPG Games</h5>
+                        <p class="card-text small">Create characters, explore worlds, and battle together with friends.</p>
+                        <p class="fw-bold mb-0">Popular: DnD</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">Card Games</h5>
+                        <p class="card-text small">Fast-paced and playable anywhere with a simple deck.</p>
+                        <p class="fw-bold mb-0">Popular: Uno</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">Fast Games</h5>
+                        <p class="card-text small">Quick setup, short rounds, and chaotic fun for everyone.</p>
+                        <p class="fw-bold mb-0">Popular: Exploding Kittens</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="carouselHome" class="w-100 carousel slide" data-aos="fade-up" data-aos-duration="1000">
+    <div class="carousel-inner rounded shadow">
+        <div class="carousel-item active">
+            <img src="~/assets/images/catan.png" class="d-block w-100 carousel-img" alt="catan">
+        </div>
+        <div class="carousel-item">
+            <img src="~/assets/images/codenames.png" class="d-block w-100 carousel-img" alt="codnames">
+        </div>
+        <div class="carousel-item">
+            <img src="~/assets/images/ticket_to_ride.png" class="d-block w-100 carousel-img" alt="ticket to ride boardgame">
+        </div>
+        <div class="carousel-item">
+            <img src="~/assets/images/dnd2.png" class="d-block w-100 carousel-img" alt="dnd">
+        </div>
+        <div class="carousel-item">
+            <img src="~/assets/images/uno.png" class="d-block w-100 carousel-img" alt="uno">
+        </div>
+        <div class="carousel-item">
+            <img src="~/assets/images/exploding_kittens.png" class="d-block w-100 carousel-img" alt="exploding kittens boardgame">
+        </div>
+        <div class="carousel-item">
+            <img src="~/assets/images/chess.png" class="d-block w-100 carousel-img" alt="chess">
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselHome" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselHome" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    </button>
+</div>
+
+<div class="bg-dark py-5" data-aos="fade-up" data-aos-duration="1000">
+    <div class="container">
+        <h2 class="text-white fw-bold mb-4">Top Board Game Sessions</h2>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">Catan Game Night</h5>
+                        <p class="mb-1 small text-secondary">Sat, 30 March – 19.00 h</p>
+                        <p class="mb-1 small"><strong>Hosted by:</strong> Marko</p>
+                        <p class="card-text small text-secondary">
+                            Vestibulum tempor condimentum quam, eget facilisis nisi facilisis quis. Aliquam sit amet ex eu diam blandit posuere id nec urna.
+                        </p>
+                        <p class="fw-bold small mt-2">5/8 players registered</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">Catan Game Night</h5>
+                        <p class="mb-1 small text-secondary">Sat, 30 March – 19.00 h</p>
+                        <p class="mb-1 small"><strong>Hosted by:</strong> Marko</p>
+                        <p class="card-text small text-secondary">
+                            Vestibulum tempor condimentum quam, eget facilisis nisi facilisis quis. Aliquam sit amet ex eu diam blandit posuere id nec urna.
+                        </p>
+                        <p class="fw-bold small mt-2">5/8 players registered</p>
+                    </div>
+                </div>
+            </div>            
+            
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">Catan Game Night</h5>
+                        <p class="mb-1 small text-secondary">Sat, 30 March – 19.00 h</p>
+                        <p class="mb-1 small"><strong>Hosted by:</strong> Marko</p>
+                        <p class="card-text small text-secondary">
+                            Vestibulum tempor condimentum quam, eget facilisis nisi facilisis quis. Aliquam sit amet ex eu diam blandit posuere id nec urna.
+                        </p>
+                        <p class="fw-bold small mt-2">5/8 players registered</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">Catan Game Night</h5>
+                        <p class="mb-1 small text-secondary">Sat, 30 March – 19.00 h</p>
+                        <p class="mb-1 small"><strong>Hosted by:</strong> Marko</p>
+                        <p class="card-text small text-secondary">
+                            Vestibulum tempor condimentum quam, eget facilisis nisi facilisis quis. Aliquam sit amet ex eu diam blandit posuere id nec urna.
+                        </p>
+                        <p class="fw-bold small mt-2">5/8 players registered</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">Catan Game Night</h5>
+                        <p class="mb-1 small text-secondary">Sat, 30 March – 19.00 h</p>
+                        <p class="mb-1 small"><strong>Hosted by:</strong> Marko</p>
+                        <p class="card-text small text-secondary">
+                            Vestibulum tempor condimentum quam, eget facilisis nisi facilisis quis. Aliquam sit amet ex eu diam blandit posuere id nec urna.
+                        </p>
+                        <p class="fw-bold small mt-2">5/8 players registered</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">Catan Game Night</h5>
+                        <p class="mb-1 small text-secondary">Sat, 30 March – 19.00 h</p>
+                        <p class="mb-1 small"><strong>Hosted by:</strong> Marko</p>
+                        <p class="card-text small text-secondary">
+                            Vestibulum tempor condimentum quam, eget facilisis nisi facilisis quis. Aliquam sit amet ex eu diam blandit posuere id nec urna.
+                        </p>
+                        <p class="fw-bold small mt-2">5/8 players registered</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">Catan Game Night</h5>
+                        <p class="mb-1 small text-secondary">Sat, 30 March – 19.00 h</p>
+                        <p class="mb-1 small"><strong>Hosted by:</strong> Marko</p>
+                        <p class="card-text small text-secondary">
+                            Vestibulum tempor condimentum quam, eget facilisis nisi facilisis quis. Aliquam sit amet ex eu diam blandit posuere id nec urna.
+                        </p>
+                        <p class="fw-bold small mt-2">5/8 players registered</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">Catan Game Night</h5>
+                        <p class="mb-1 small text-secondary">Sat, 30 March – 19.00 h</p>
+                        <p class="mb-1 small"><strong>Hosted by:</strong> Marko</p>
+                        <p class="card-text small text-secondary">
+                            Vestibulum tempor condimentum quam, eget facilisis nisi facilisis quis. Aliquam sit amet ex eu diam blandit posuere id nec urna.
+                        </p>
+                        <p class="fw-bold small mt-2">5/8 players registered</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 bg-black bg-opacity-75 text-white border-0 shadow-sm"
+                     data-aos="flip-right" data-aos-duration="2000">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold">Catan Game Night</h5>
+                        <p class="mb-1 small text-secondary">Sat, 30 March – 19.00 h</p>
+                        <p class="mb-1 small"><strong>Hosted by:</strong> Marko</p>
+                        <p class="card-text small text-secondary">
+                            Vestibulum tempor condimentum quam, eget facilisis nisi facilisis quis. Aliquam sit amet ex eu diam blandit posuere id nec urna.
+                        </p>
+                        <p class="fw-bold small mt-2">5/8 players registered</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-dark" data-aos="fade-up" data-aos-duration="1000">
+    <h2 class="text-white fw-bold mb-4 ms-5">What Our Players Say</h2>
+
+    <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="0" class="active bg-white" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="1" class="bg-white" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="2" class="bg-white" aria-label="Slide 3"></button>
+        </div>
+
+        <div class="carousel-inner bg-black bg-opacity-75 text-white p-5 rounded shadow-sm">
+            <div class="carousel-item active text-center">
+                <p class="fst-italic">"Donec euismod eleifend metus, nec malesuada justo semper at. Nam in feugiat magna, et hendrerit orci."</p>
+                <p class="fw-bold">– Username1</p>
+            </div>
+
+            <div class="carousel-item text-center">
+                <p class="fst-italic">"Quisque sapien enim, sodales congue orci non, accumsan tristique arcu. Donec sit amet ante vitae neque bibendum suscipit."</p>
+                <p class="fw-bold">– Username2</p>
+            </div>
+
+            <div class="carousel-item text-center">
+                <p class="fst-italic">"Vestibulum hendrerit nec ex sit amet vulputate. Duis nec pellentesque ex. Duis justo libero, cursus suscipit dui et, faucibus tempus turpis."</p>
+                <p class="fw-bold">– Username3</p>
+            </div>
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/typing_animation.js" asp-append-version="true"></script>
+}
