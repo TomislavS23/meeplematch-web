@@ -10,15 +10,18 @@ public class HomeController : Controller
 
     public HomeController(ILogger<HomeController> logger)
     {
+        // test
         _logger = logger;
     }
 
     public IActionResult Index()
     {
+        // test
         return View();
     }
     public IActionResult About()
     {
+        // test
         return View();
     }
 
