@@ -1,3 +1,10 @@
+using meeplematch_api.Model;
+using meeplematch_api.Repository;
+using meeplematch_api.Service;
+using meeplematch_api.Utils;
+using meeplematch_web.Mapping;
+using Microsoft.EntityFrameworkCore;
+
 namespace meeplematch_web;
 
 public class Program
@@ -8,6 +15,13 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
+
+        builder.Services.AddScoped<IEventRepository, EventRepository>();
+
+        builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+        builder.Services.AddDbContext<MeepleMatchContext>(
+            options => options.UseNpgsql(Constants.PsqlConnectionString));
 
         var app = builder.Build();
 
@@ -29,6 +43,15 @@ public class Program
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
+
+        //app.UseEndpoints(endpoints =>
+        //{
+        //    endpoints.MapControllers();
+        //    endpoints.MapDefaultControllerRoute();
+        //    //endpoints.MapControllerRoute(
+        //    //    name: "default",
+        //    //    pattern: "{controller=Home}/{action=Index}/{id?}");
+        //});
 
         app.Run();
     }
