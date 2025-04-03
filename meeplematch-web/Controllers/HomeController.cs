@@ -21,7 +21,8 @@ public class HomeController : Controller
     }
     public IActionResult About()
     {
-        // test
+        // test - test 2git status
+        ViewData["Message"] = "Your application description page.";
         return View();
     }
 
