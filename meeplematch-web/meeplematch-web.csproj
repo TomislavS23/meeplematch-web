@@ -7,4 +7,35 @@
         <RootNamespace>meeplematch_web</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Content Remove="wwwroot\assets\catan.png" />
+      <Content Remove="wwwroot\assets\codenames.png" />
+      <Content Remove="wwwroot\assets\dnd.png" />
+      <Content Remove="wwwroot\assets\dnd2.png" />
+      <Content Remove="wwwroot\assets\exploding_kittens.png" />
+      <Content Remove="wwwroot\assets\game1.png" />
+      <Content Remove="wwwroot\assets\game2.png" />
+      <Content Remove="wwwroot\assets\logo_without_title.png" />
+      <Content Remove="wwwroot\assets\ticket_to_ride.png" />
+      <Content Remove="wwwroot\assets\uno.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="wwwroot\assets\images\catan.png" />
+      <Resource Include="wwwroot\assets\images\codenames.png" />
+      <Resource Include="wwwroot\assets\images\dnd.png" />
+      <Resource Include="wwwroot\assets\images\dnd2.png" />
+      <Resource Include="wwwroot\assets\images\exploding_kittens.png" />
+      <Resource Include="wwwroot\assets\images\game2.png" />
+      <Resource Include="wwwroot\assets\images\logo_without_title.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="wwwroot\assets\images\ticket_to_ride.png" />
+      <Resource Include="wwwroot\assets\images\uno.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\assets\videos\" />
+    </ItemGroup>
+
 </Project>
