@@ -1,0 +1,107 @@
+﻿@{
+    ViewData["Title"] = "About";
+}
+
+<div class="bg-gradient bg-danger text-white py-5 w-100 shadow-sm" data-aos="fade-up" data-aos-duration="1000">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <h1 class="display-4 mb-4">Hello! Nice to meet you!</h1>
+                <p class="lead mx-auto mx-md-0" style="max-width: 800px;">
+                    MeepleMatch is a student-built platform to bring board game lovers together.
+                    Organize tabletop events, invite friends, track your game history, and never lose your meeples again!
+                </p>
+            </div>
+
+            <div class="col-md-6 mb-4 mb-md-0 d-flex justify-content-center">
+                <div>
+                    <lottie-player src="@Url.Content("~/assets/json/controller_lottie.json")"
+                                   background="transparent"
+                                   speed="1"
+                                   style="width: 100%; max-width: 300px; height: auto;"
+                                   loop
+                                   autoplay>
+                    </lottie-player>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-dark text-white d-flex justify-content-center align-items-center" style="height: 150px;"
+     data-aos="fade-up" data-aos-duration="1000">
+    <p class="display-6 text-center">Rolling the dice is just the start.</p>
+</div>
+
+<div class="w-100 overflow-hidden" style="position: relative; height: 700px;"
+     data-aos="fade-up" data-aos-duration="1000">
+    <video autoplay muted loop playsinline
+            style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
+        <source src="@Url.Content("~/assets/videos/rolling_dice_video.mp4")" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+
+<div class="bg-dark text-white d-flex justify-content-center align-items-center" style="height: 150px;"
+     data-aos="fade-up" data-aos-duration="1000">
+    <h4 class="display-6 text-center">MeepleMatch helps you bring game nights to life.</h4>
+</div>
+
+<div id="carouselAbout" class="carousel slide" data-bs-ride="carousel"
+     data-aos="fade-up" data-aos-duration="1000">
+    <div class="carousel-inner rounded shadow">
+        <div class="carousel-item active">
+            <img src="~/assets/images/game5.jpg" class="d-block w-100 carousel-img" alt="playing figure near dices">
+        </div>
+        <div class="carousel-item">
+            <img src="~/assets/images/game6.png" class="d-block w-100 carousel-img" alt="table with cards in a circle">
+        </div>
+        <div class="carousel-item">
+            <img src="~/assets/images/game7.png" class="d-block w-100 carousel-img" alt="hands holding cards">
+        </div>            
+        <div class="carousel-item">
+            <img src="~/assets/images/game.8.png" class="d-block w-100 carousel-img" alt="table with boardgame cards">
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselAbout" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselAbout" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    </button>
+</div>
+
+<div class="bg-dark py-5" data-aos="fade-up" data-aos-duration="1000">
+    <div class="container">
+        <h2 class=" display-6 mb-4 text-white">Meet the Team</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col">
+                <div class="card h-100 shadow-sm" data-aos="flip-right" data-aos-duration="2000">
+                    <img src="~/assets/images/placeholder_man_profile_pic.jpg" class="card-img-top team-member-img" alt="team member 1">
+                    <div class="card-body">
+                        <h5 class="card-title">Tomislav Senjanin</h5>
+                        <p class="card-text">Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In ac metus hendrerit, efficitur nibh a, iaculis massa. Aenean facilisis ligula velit, vel posuere leo condimentum sed.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 shadow-sm" data-aos="flip-right" data-aos-duration="2000">
+                    <img src="~/assets/images/placeholder_man_profile_pic.jpg" class="card-img-top team-member-img" alt="team member 2">
+                    <div class="card-body">
+                        <h5 class="card-title">Lukas Deni Posavec</h5>
+                        <p class="card-text">Curabitur elementum, sapien eget dignissim ultrices, turpis orci ornare massa, at hendrerit velit nibh eu ipsum. Duis eleifend, elit in hendrerit cursus, justo sapien viverra nunc, ac bibendum.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 shadow-sm" data-aos="flip-right" data-aos-duration="2000">
+                    <img src="~/assets/images/placeholder_woman_profile_pic.jpg" class="card-img-top team-member-img" alt="team member 3">
+                    <div class="card-body">
+                        <h5 class="card-title">Antonela Abičić</h5>
+                        <p class="card-text">Cras tempor molestie mi vel blandit. Aliquam ipsum sem, sagittis in erat at, pharetra ullamcorper massa. Fusce finibus turpis nunc. Aenean eu urna ac felis congue congue quis facilisis metus. </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

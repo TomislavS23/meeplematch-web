@@ -18,5 +18,128 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    margin: 0;
+    padding: 0;
 }
+
+.logo-text {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: whitesmoke !important;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+}
+
+.carousel-img {
+    height: 500px;
+    object-fit: cover;
+}
+
+.team-member-img {
+    max-height: 200px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.footer-custom {
+    background-image: url('/assets/images/footer.png');
+    background-size: cover;
+    background-position: center;
+    min-height: 80px;
+    padding: 20px 10px;
+    position: relative;
+    color: white;
+}
+
+.container-custom {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-custom h5 {
+    font-size: clamp(1rem, 2vw, 1.5rem); 
+    margin-bottom: 0.25rem;
+}
+
+.footer-custom p {
+    font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+    margin: 0;
+}
+
+/* VIDEO BG FOR TYPING ANIMATION */
+.bg-video-wrapper {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.bg-video-wrapper video {
+    position: relative;
+    min-width: 100%;
+    min-height: 100vh;
+    object-fit: cover;
+    z-index: 1; 
+}
+
+.bg-video-wrapper .overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2; 
+}
+
+.bg-video-wrapper h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    margin: 0;
+    color: white;
+    text-align: center;
+}
+
+#cursor {
+    color: yellow;
+    font-size: 1.2em;
+    animation: blink 1.1s linear infinite;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+.meeplematch-title {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+}
+
+.cta-btn {
+    position: absolute;
+    top: 67%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    text-align: center;
+}
+
