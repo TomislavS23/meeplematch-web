@@ -19,6 +19,7 @@ namespace meeplematch_web.Controllers
 
         public EventController(ILogger<EventController> logger, IEventRepository eventRepository, IMapper mapper)
         {
+            // PR TEST
             _logger = logger;
             _eventRepository = eventRepository;
             _mapper = mapper;
