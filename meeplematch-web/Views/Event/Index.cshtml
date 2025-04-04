@@ -92,7 +92,8 @@
                     <a asp-action="Edit" asp-route-id="@item.IdEvent" class="btn btn-info">Edit</a>
                     <a asp-action="Details" asp-route-id="@item.IdEvent" class="btn btn-warning">Details</a>
                         @* <a asp-action="Delete" asp-route-id="@item.IdEvent" class="btn btn-danger">Delete</a> *@
-                        <a class="btn btn-danger" href="/Event/Delete/@item.IdEvent">Delete</a>
+                        @* <a class="btn btn-danger" href="/Event/Delete/@item.IdEvent">Delete</a> *@
+                        <a asp-action="Delete2" asp-route-id="@item.IdEvent" class="btn btn-danger">Delete</a>
                 </td>
             </tr>
     }
