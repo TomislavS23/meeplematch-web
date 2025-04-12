@@ -10,9 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-gradient bg-danger box-shadow">
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-gradient bg-danger box-shadow">
         <div class="container-fluid">
             <a class="navbar-brand logo-text" asp-area="" asp-controller="Home" asp-action="Index">
                 MeepleMatch
@@ -29,24 +29,25 @@
                     <li class="nav-item">
                         <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="About">About</a>
                     </li>
-                    <li class="nav-item">
+@*                     <li class="nav-item">
                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                    </li>
+                    </li> *@
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Event" asp-action="Index">Events</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="Event" asp-action="Index">Events</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 </header>
-    <div class="container-fluid p-0">
-    <main role="main">
-        @RenderBody()
-    </main>
-</div>
 
-<footer class="footer-custom text-white">
+<main role="main" class="flex-fill bg-dark text-white">
+    <div class="container-fluid p-0">
+        @RenderBody()
+    </div>
+</main>
+
+<footer class="footer-custom text-white mt-auto">
     <div class="container-custom d-flex flex-column justify-content-center align-items-center text-center">
         <h5 class="fw-bold mb-1">Connecting board game lovers everywhere.</h5>
         <p class="mb-0">MeepleMatch ©</p>

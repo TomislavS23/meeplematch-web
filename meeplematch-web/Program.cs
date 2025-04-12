@@ -17,6 +17,7 @@ public class Program
         builder.Services.AddControllersWithViews();
 
         builder.Services.AddScoped<IEventRepository, EventRepository>();
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
 
         builder.Services.AddAutoMapper(typeof(MappingProfile));
 
