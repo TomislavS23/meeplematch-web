@@ -4,62 +4,108 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<div class="container my-5">
+    <h2 class="mb-4">Edit Game Event</h2>
 
-<h4>EventViewModel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+    <form asp-action="Edit" enctype="multipart/form-data" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <input type="hidden" asp-for="IdEvent" />
+
+        <div class="text-center mb-4">
+            <input type="file" name="image" accept="image/*" class="d-none" id="imageUploadInput" />
+            <label for="imageUploadInput" style="cursor: pointer;" data-bs-toggle="tooltip" title="Click to change the image">
+                <img id="imagePreview"
+                     src="@(!string.IsNullOrEmpty(Model.ImagePath) ? Model.ImagePath : Url.Content("~/assets/images/game_night_placeholder.png"))"
+                     alt="Event Image"
+                     class="img-thumbnail shadow"
+                     style="width: 100%; max-width: 400px; height: 300px; object-fit: cover;" />
+            </label>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Name" class="form-label">Title</label>
+                    <input asp-for="Name" class="form-control" placeholder="Event title" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Game" class="form-label">Game</label>
+                    <input asp-for="Game" class="form-control" placeholder="e.g. Catan, Uno..." />
+                    <span asp-validation-for="Game" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Type" class="form-label">Type</label>
+                    <input asp-for="Type" class="form-control" placeholder="e.g. Casual, Social, Tournament..." />
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Location" class="form-label">Location</label>
+                    <input asp-for="Location" class="form-control" placeholder="Where is it?" />
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="EventDate" class="form-label">Date & Time</label>
+                    <input asp-for="EventDate" type="datetime-local" class="form-control" />
+                    <span asp-validation-for="EventDate" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Type" class="control-label"></label>
-                <input asp-for="Type" class="form-control" />
-                <span asp-validation-for="Type" class="text-danger"></span>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="MinParticipants" class="form-label">Min Participants</label>
+                    <input asp-for="MinParticipants" type="number" class="form-control" />
+                    <span asp-validation-for="MinParticipants" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Capacity" class="form-label">Max Participants</label>
+                    <input asp-for="Capacity" type="number" class="form-control" />
+                    <span asp-validation-for="Capacity" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="7" placeholder="Tell us more about the event..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Game" class="control-label"></label>
-                <input asp-for="Game" class="form-control" />
-                <span asp-validation-for="Game" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Location" class="control-label"></label>
-                <input asp-for="Location" class="form-control" />
-                <span asp-validation-for="Location" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EventDate" class="control-label"></label>
-                <input asp-for="EventDate" class="form-control" />
-                <span asp-validation-for="EventDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Capacity" class="control-label"></label>
-                <input asp-for="Capacity" class="form-control" />
-                <span asp-validation-for="Capacity" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MinParticipants" class="control-label"></label>
-                <input asp-for="MinParticipants" class="form-control" />
-                <span asp-validation-for="MinParticipants" class="text-danger"></span>
-            </div>
-            @* <div class="form-group"> *@
-            @*     <label asp-for="CreatedBy" class="control-label"></label> *@
-            @*     <input asp-for="CreatedBy" class="form-control" /> *@
-            @*     <span asp-validation-for="CreatedBy" class="text-danger"></span> *@
-            @* </div> *@
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary mt-3" />
-                <a asp-action="Index" class="btn btn-secondary mt-3">Back to List</a>
-            </div>
-        </form>
-    </div>
+        </div>
+
+        <div class="mt-4">
+            <input type="submit" value="Save Changes" class="btn btn-primary" />
+            <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        const imageInput = document.getElementById('imageUploadInput');
+        const imagePreview = document.getElementById('imagePreview');
+
+        imageInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
 }

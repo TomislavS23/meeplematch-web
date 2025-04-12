@@ -1,5 +1,6 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
+    overflow-x: hidden;
 }
 
 @media (min-width: 768px) {
@@ -141,5 +142,40 @@ body {
     transform: translateX(-50%);
     z-index: 3;
     text-align: center;
+}
+
+.event-img {
+    width: 100%;
+    height: 200px; 
+    object-fit: cover;
+}
+
+input[name="Name"]::placeholder {
+    color: #444 !important;
+    opacity: 1 !important;
+}
+input[name="Game"]::placeholder {
+    color: #444 !important;
+    opacity: 1 !important;
+}
+input[name="Type"]::placeholder {
+    color: #444 !important;
+    opacity: 1 !important;
+}
+input[name="Location"]::placeholder {
+    color: #444 !important;
+    opacity: 1 !important;
+}
+input[name="MinParticipants"]::placeholder {
+    color: #444 !important;
+    opacity: 1 !important;
+}
+input[name="Capacity"]::placeholder {
+    color: #444 !important;
+    opacity: 1 !important;
+}
+textarea[name="Description"]::placeholder {
+    color: #444 !important;
+    opacity: 1 !important;
 }
 
