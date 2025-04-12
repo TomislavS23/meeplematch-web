@@ -185,8 +185,37 @@ namespace meeplematch_web.Controllers
 
         // POST: EventController/Delete/5
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id, EventDTO eventDTO)
+        {
+            try
+            {
+                if (_eventRepository.FindById(id) is null) return NotFound();
+                _eventRepository.Delete(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                //return RedirectToAction(nameof(Details), id);
+            }
+                return RedirectToAction(nameof(Index));
+        }
+
+
+
+        // GET: EventController/Delete/5
+        public IActionResult Delete2(int id)
+        {
+            var @event = _eventRepository.FindById(id);
+            if (@event is null) return NotFound();
+            var eventViewModel = _mapper.Map<EventViewModel>(@event);
+            return View(eventViewModel);
+        }
+
+        // POST: EventController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete2(int id, EventDTO eventDTO)
         {
             try
             {

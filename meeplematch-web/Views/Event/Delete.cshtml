@@ -85,7 +85,9 @@
         </dd>
     </dl>
     
-    <form asp-action="Delete">
+    <form asp-controller="Event" asp-action="Delete2">
+        @* <form action="/Event/Delete/@Model.IdEvent" method="post"> *@
+        <input type="hidden" asp-for="IdEvent" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
