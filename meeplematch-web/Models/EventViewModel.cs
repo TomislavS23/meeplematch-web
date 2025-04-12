@@ -1,4 +1,5 @@
 ﻿using meeplematch_api.Model;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 
 namespace meeplematch_web.Models
@@ -34,6 +35,10 @@ namespace meeplematch_web.Models
         [Display(Name = "Updated At")]
         public DateTime? UpdatedAt { get; set; }
 
+        public string? Description { get; set; }
+        public string? ImagePath { get; set; }
+
+        [ValidateNever]
         public virtual User CreatedByNavigation { get; set; } = null!;
 
         public virtual ICollection<EventComment> EventComments { get; set; } = new List<EventComment>();

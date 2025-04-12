@@ -15,28 +15,52 @@ namespace meeplematch_web.Controllers
     {
         private readonly ILogger<EventController> _logger;
         private readonly IEventRepository _eventRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public EventController(ILogger<EventController> logger, IEventRepository eventRepository, IMapper mapper)
+        public EventController(ILogger<EventController> logger, IEventRepository eventRepository, IUserRepository userRepository, IMapper mapper)
         {
             // PR TEST
             _logger = logger;
             _eventRepository = eventRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
         }
 
-        public IActionResult Index(string search = "")
+        public IActionResult Index(string search = "", int page = 1, int pageSize = 12)
         {
-            var events = string.IsNullOrEmpty(search) ? _eventRepository.FindAll() : _eventRepository.FindAll()
-                .Where(e => e.Name.ToLower().Contains(search.ToLower()) || e.Game.ToLower().Contains(search.ToLower()));
-            var eventsViewModel = _mapper.Map<IEnumerable<EventViewModel>>(events);
+            var events = string.IsNullOrEmpty(search)
+                ? _eventRepository.FindAll()
+                : _eventRepository.FindAll()
+                    .Where(e => e.Name.ToLower().Contains(search.ToLower()) || e.Game.ToLower().Contains(search.ToLower()));
 
-            if(Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            var pagedEvents = events
+                .OrderBy(e => e.EventDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var totalItems = events.Count();
+            var viewModel = _mapper.Map<List<EventViewModel>>(pagedEvents);
+
+            foreach (var ev in viewModel)
             {
-                return PartialView("_EventListPartial", eventsViewModel);
+                var userDto = _userRepository.GetUser(ev.CreatedBy);
+                ev.CreatedByNavigation = new User
+                {
+                    Username = userDto.Username 
+                };
             }
 
-            return View(eventsViewModel);
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_EventListPartial", viewModel);
+            }
+
+            return View(viewModel);
         }
 
         // GET: EventController/Details/5
@@ -57,22 +81,45 @@ namespace meeplematch_web.Controllers
         // POST: EventController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(EventDTO @event)
+        public IActionResult Create(EventViewModel viewModel, IFormFile image)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                @event.CreatedAt = DateTime.UtcNow;
-                _eventRepository.Save(@event);
-                return RedirectToAction(nameof(Index));
+                foreach (var kvp in ModelState)
+                {
+                    var field = kvp.Key;
+                    var errors = kvp.Value.Errors;
+                    foreach (var error in errors)
+                    {
+                        _logger.LogError($"Validation error in '{field}': {error.ErrorMessage}");
+                    }
+                }
+
+                return View(viewModel);
             }
 
-            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            if (image != null && image.Length > 0)
             {
-                _logger.LogError(error.ErrorMessage);
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "pic_uploads");
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    image.CopyTo(stream);
+                }
+
+                viewModel.ImagePath = $"/assets/pic_uploads/{uniqueFileName}";
             }
 
-            var eventViewModel = _mapper.Map<EventViewModel>(@event);
-            return View(eventViewModel);
+            var eventDto = _mapper.Map<EventDTO>(viewModel);
+
+            eventDto.CreatedBy = 2;
+            eventDto.CreatedAt = DateTime.UtcNow;
+
+            _eventRepository.Save(eventDto);
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: EventController/Edit/5
@@ -87,20 +134,45 @@ namespace meeplematch_web.Controllers
         // POST: EventController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, EventDTO @event)
+        public IActionResult Edit(int id, EventViewModel viewModel, IFormFile image)
         {
-            if (@event is null) return NotFound();
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                @event.UpdatedAt = DateTime.UtcNow;
-                _eventRepository.Update(@event, id);
-                return RedirectToAction(nameof(Index));
+                return View(viewModel);
             }
 
-            var eventViewModel = _mapper.Map<EventViewModel>(@event);
-            return View(eventViewModel);
+            var existingEvent = _eventRepository.FindById(id);
+            if (existingEvent == null)
+            {
+                return NotFound();
+            }
+
+            if (image != null && image.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "pic_uploads");
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    image.CopyTo(stream);
+                }
+
+                viewModel.ImagePath = $"/assets/pic_uploads/{uniqueFileName}";
+            }
+            else
+            {
+                viewModel.ImagePath = existingEvent.ImagePath;
+            }
+
+            var eventDto = _mapper.Map<EventDTO>(viewModel);
+            eventDto.UpdatedAt = DateTime.UtcNow;
+
+            _eventRepository.Update(eventDto, id);
+
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: EventController/Delete/5
         public IActionResult Delete(int id)
