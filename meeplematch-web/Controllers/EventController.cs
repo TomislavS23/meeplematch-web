@@ -71,7 +71,6 @@ namespace meeplematch_web.Controllers
 
             var eventViewModel = _mapper.Map<EventViewModel>(@event);
 
-            // Assign username to CreatedByNavigation manually
             var userDto = _userRepository.GetUser(eventViewModel.CreatedBy);
             eventViewModel.CreatedByNavigation = new User
             {
