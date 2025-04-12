@@ -68,7 +68,15 @@ namespace meeplematch_web.Controllers
         {
             var @event = _eventRepository.FindById(id);
             if (@event is null) return NotFound();
+
             var eventViewModel = _mapper.Map<EventViewModel>(@event);
+
+            var userDto = _userRepository.GetUser(eventViewModel.CreatedBy);
+            eventViewModel.CreatedByNavigation = new User
+            {
+                Username = userDto.Username
+            };
+
             return View(eventViewModel);
         }
 
@@ -114,7 +122,7 @@ namespace meeplematch_web.Controllers
 
             var eventDto = _mapper.Map<EventDTO>(viewModel);
 
-            eventDto.CreatedBy = 2;
+            eventDto.CreatedBy = 2; // hardcoded until login is implemented
             eventDto.CreatedAt = DateTime.UtcNow;
 
             _eventRepository.Save(eventDto);
