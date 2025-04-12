@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using meeplematch_api.Model;
-using meeplematch_api.Service;
-using Microsoft.EntityFrameworkCore;
 using meeplematch_api.Repository;
 using meeplematch_api.DTO;
 using AutoMapper;
 using meeplematch_web.Models;
+using System.Text.Json;
+using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace meeplematch_web.Controllers
 {
@@ -17,59 +17,69 @@ namespace meeplematch_web.Controllers
         private readonly IEventRepository _eventRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public EventController(ILogger<EventController> logger, IEventRepository eventRepository, IUserRepository userRepository, IMapper mapper)
+        public EventController(ILogger<EventController> logger, IEventRepository eventRepository, IUserRepository userRepository, IMapper mapper, IHttpClientFactory httpClientFactory)
         {
-            // PR TEST
             _logger = logger;
             _eventRepository = eventRepository;
             _userRepository = userRepository;
             _mapper = mapper;
+            _httpClientFactory = httpClientFactory;
         }
 
-        public IActionResult Index(string search = "", int page = 1, int pageSize = 12)
+        public IActionResult Index(string search = "", int page = 1, int pageSize = 3)
         {
-            var events = string.IsNullOrEmpty(search)
-                ? _eventRepository.FindAll()
-                : _eventRepository.FindAll()
-                    .Where(e => e.Name.ToLower().Contains(search.ToLower()) || e.Game.ToLower().Contains(search.ToLower()));
-
-            var pagedEvents = events
-                .OrderBy(e => e.EventDate)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            var totalItems = events.Count();
-            var viewModel = _mapper.Map<List<EventViewModel>>(pagedEvents);
-
-            foreach (var ev in viewModel)
-            {
-                var userDto = _userRepository.GetUser(ev.CreatedBy);
-                ev.CreatedByNavigation = new User
+            var httpClient = _httpClientFactory.CreateClient("MeepleMatch");
+                HttpResponseMessage response = httpClient.GetAsync("events").Result;
+                if (response.IsSuccessStatusCode)
                 {
-                    Username = userDto.Username 
-                };
-            }
+                    var events = string.IsNullOrEmpty(search)
+                        ? response.Content.ReadAsAsync<List<EventViewModel>>().Result
+                        : response.Content.ReadAsAsync<List<EventViewModel>>().Result
+                            .Where(e => e.Name.ToLower().Contains(search.ToLower()) || e.Game.ToLower().Contains(search.ToLower()))
+                            .ToList();
 
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+                    var pagedEvents = events
+                        .OrderBy(e => e.EventDate)
+                        .Skip((page - 1) * pageSize)
+                        .Take(pageSize)
+                        .ToList();
 
-            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-            {
-                return PartialView("_EventListPartial", viewModel);
-            }
+                    foreach (var ev in pagedEvents)
+                    {
+                        var userDto = _userRepository.GetUser(ev.CreatedBy);
+                        ev.CreatedByNavigation = new User
+                        {
+                            Username = userDto.Username
+                        };
+                    }
 
-            return View(viewModel);
+                    ViewBag.CurrentPage = page;
+                    ViewBag.TotalPages = (int)Math.Ceiling((double)events.Count / pageSize);
+
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return PartialView("_EventListPartial", pagedEvents);
+                    }
+                    return View(pagedEvents);
+                }
+
+            return StatusCode(500);
         }
 
         // GET: EventController/Details/5
         public IActionResult Details(int id)
         {
-            var @event = _eventRepository.FindById(id);
-            if (@event is null) return NotFound();
-            var eventViewModel = _mapper.Map<EventViewModel>(@event);
-            return View(eventViewModel);
+            var httpClient = _httpClientFactory.CreateClient("MeepleMatch");
+            HttpResponseMessage response = httpClient.GetAsync($"events/{id}").Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var @event = response.Content.ReadAsAsync<EventViewModel>().Result;
+                    return View(@event);
+                }
+
+            return NotFound();
         }
 
         // GET: EventController/Create
@@ -81,8 +91,9 @@ namespace meeplematch_web.Controllers
         // POST: EventController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(EventViewModel viewModel, IFormFile image)
+        public async Task<IActionResult> Create(EventViewModel viewModel, IFormFile? image)
         {
+
             if (!ModelState.IsValid)
             {
                 foreach (var kvp in ModelState)
@@ -112,14 +123,22 @@ namespace meeplematch_web.Controllers
                 viewModel.ImagePath = $"/assets/pic_uploads/{uniqueFileName}";
             }
 
-            var eventDto = _mapper.Map<EventDTO>(viewModel);
+            viewModel.CreatedBy = 1;
+            viewModel.CreatedAt = DateTime.UtcNow;
 
-            eventDto.CreatedBy = 2;
-            eventDto.CreatedAt = DateTime.UtcNow;
+            var postEvent = new StringContent(
+                JsonSerializer.Serialize(viewModel),
+                Encoding.UTF8,
+                Application.Json);
+            var httpClient = _httpClientFactory.CreateClient("MeepleMatch");
+            using var response = await httpClient.PostAsync("events", postEvent);
 
-            _eventRepository.Save(eventDto);
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction(nameof(Index));
+            }
 
-            return RedirectToAction(nameof(Index));
+            return View(viewModel);
         }
 
         // GET: EventController/Edit/5

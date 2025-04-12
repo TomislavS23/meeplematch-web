@@ -24,6 +24,12 @@ public class Program
         builder.Services.AddDbContext<MeepleMatchContext>(
             options => options.UseNpgsql(Constants.PsqlConnectionString));
 
+        builder.Services.AddHttpClient("MeepleMatch", httpClient =>
+        {
+            string apiUrl = "http://localhost:5202/api/meeplematch/";
+            httpClient.BaseAddress = new Uri(apiUrl);
+        });
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

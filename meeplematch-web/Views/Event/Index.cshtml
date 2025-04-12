@@ -20,7 +20,7 @@
         <div class="row g-4" id="eventList">
             @foreach (var item in Model)
             {
-                <div class="col-12 col-sm-6 col-lg-3">
+                <div class="one-card col-12 col-sm-6 col-lg-3">
                     <div class="card h-100 shadow-sm" data-aos="flip-right" data-aos-duration="1500">
                         <img src="@(!string.IsNullOrEmpty(item.ImagePath) ? item.ImagePath : Url.Content("~/assets/images/game_night_placeholder.png"))"
                              class="card-img-top event-img" />
@@ -66,89 +66,6 @@
 
     </div>
 </div>
-
-<div id="eventList">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Type)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Game)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Location)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.EventDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Capacity)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.MinParticipants)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CreatedBy)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CreatedAt)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.UpdatedAt)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-    @foreach (var item in Model) {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Type)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Game)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Location)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EventDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Capacity)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.MinParticipants)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreatedBy)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreatedAt)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UpdatedAt)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.IdEvent" class="btn btn-info">Edit</a>
-                    <a asp-action="Details" asp-route-id="@item.IdEvent" class="btn btn-warning">Details</a>
-                        @* <a asp-action="Delete" asp-route-id="@item.IdEvent" class="btn btn-danger">Delete</a> *@
-                        @* <a class="btn btn-danger" href="/Event/Delete/@item.IdEvent">Delete</a> *@
-                        <a asp-action="Delete2" asp-route-id="@item.IdEvent" class="btn btn-danger">Delete</a>
-                </td>
-            </tr>
-    }
-        </tbody>
-    </table>
-</div>
 @section Scripts {
     <script>
         const searchInput = document.getElementById("searchInput");
@@ -171,9 +88,17 @@
                 .then(data => {
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(data, "text/html");
-                    const updatedCards = doc.querySelector("#eventList").innerHTML;
-                    document.querySelector("#eventList").innerHTML = updatedCards;
-                    AOS.refresh(); 
+                    // const updatedCards = doc.querySelectorAll(".col-12.col-sm-6.col-lg-3");
+                    const updatedCards = doc.querySelectorAll(".one-card");
+
+                    const eventList = document.querySelector("#eventList");
+                    eventList.innerHTML = "";
+
+                    updatedCards.forEach(card => {
+                        eventList.appendChild(card);
+                    });
+
+                    AOS.refresh();
                 })
                 .catch(error => console.error("Error fetching events:", error));
         });
