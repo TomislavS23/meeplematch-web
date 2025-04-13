@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
+using System.Composition;
+using System.Diagnostics.Tracing;
 
 namespace meeplematch_web.Models
 {
@@ -37,5 +39,14 @@ namespace meeplematch_web.Models
         public string? Description { get; set; }
         public string? ImagePath { get; set; }
 
+        [ValidateNever]
+        public virtual UserViewModel CreatedByNavigation { get; set; } = null!;
+        public virtual ICollection<EventCommentViewModel> EventComments { get; set; } = new List<EventCommentViewModel>();
+
+        public virtual ICollection<EventParticipantViewModel> EventParticipants { get; set; } = new List<EventParticipantViewModel>();
+
+        public virtual ICollection<EventRatingViewModel> EventRatings { get; set; } = new List<EventRatingViewModel>();
+
+        public virtual ICollection<ReportViewModel> Reports { get; set; } = new List<ReportViewModel>();
     }
 }

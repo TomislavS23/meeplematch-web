@@ -7,6 +7,7 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Linq;
 using System.Collections.Specialized;
 using NuGet.Protocol;
+using meeplematch_web.Utils;
 
 namespace meeplematch_web.Controllers
 {
@@ -17,6 +18,8 @@ namespace meeplematch_web.Controllers
         private readonly IMapper _mapper;
         private readonly IHttpClientFactory _httpClientFactory;
 
+        private readonly string apiUri = "events";
+
         public EventController(ILogger<EventController> logger, IMapper mapper, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
@@ -26,40 +29,58 @@ namespace meeplematch_web.Controllers
 
         public IActionResult Index(string search = "", int page = 1, int pageSize = 3)
         {
-            var httpClient = _httpClientFactory.CreateClient("MeepleMatch");
-                HttpResponseMessage response = httpClient.GetAsync("events").Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    var events = string.IsNullOrEmpty(search)
-                        ? response.Content.ReadAsAsync<List<EventViewModel>>().Result
-                        : response.Content.ReadAsAsync<List<EventViewModel>>().Result
-                            .Where(e => e.Name.ToLower().Contains(search.ToLower()) || e.Game.ToLower().Contains(search.ToLower()))
-                            .ToList();
-
-                    var pagedEvents = events
-                        .OrderBy(e => e.EventDate)
-                        .Skip((page - 1) * pageSize)
-                        .Take(pageSize)
+            var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
+            HttpResponseMessage response = httpClient.GetAsync(apiUri).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                var events = string.IsNullOrEmpty(search)
+                    ? response.Content.ReadAsAsync<List<EventViewModel>>().Result
+                    : response.Content.ReadAsAsync<List<EventViewModel>>().Result
+                        .Where(e => e.Name.ToLower().Contains(search.ToLower()) || e.Game.ToLower().Contains(search.ToLower()))
                         .ToList();
 
-                    foreach (var ev in pagedEvents)
-                    {
-                        //var userDto = _userRepository.GetUser(ev.CreatedBy);
-                        //ev.CreatedByNavigation = new User
-                        //{
-                        //    Username = userDto.Username
-                        //};
-                    }
+                var pagedEvents = events
+                    .OrderBy(e => e.EventDate)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
 
-                    ViewBag.CurrentPage = page;
-                    ViewBag.TotalPages = (int)Math.Ceiling((double)events.Count / pageSize);
-
-                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                foreach (var ev in pagedEvents)
+                {
+                    // put your own Bearer token here
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJhZG1pbiIsImV4cCI6MTc0NDU4MDIzNX0.MXX2ELDlDi7WYEYUiDhkNQ4D1BJzwkxTfBa1SOA-0vQ");
+                    var userResult = httpClient.GetAsync($"user/{ev.CreatedBy}").Result;
+                    if (userResult.IsSuccessStatusCode)
                     {
-                        return PartialView("_EventListPartial", pagedEvents);
+                        var users = userResult.Content.ReadAsAsync<List<UserViewModel>>().Result;
+                        var user = users.Where(u => u.IdUser == ev.CreatedBy).FirstOrDefault();
+                        if (user != null)
+                        {
+                            ev.CreatedByNavigation = new UserViewModel
+                            {
+                                Username = user.Username
+                            };
+                        }
+                        else
+                        {
+                            _logger.LogError($"User with ID {ev.CreatedBy} not found in the response.");
+                        }
                     }
-                    return View(pagedEvents);
+                    else
+                    {
+                        _logger.LogError($"Failed to retrieve user with ID {ev.CreatedBy}");
+                    }
                 }
+
+                ViewBag.CurrentPage = page;
+                ViewBag.TotalPages = (int)Math.Ceiling((double)events.Count / pageSize);
+
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return PartialView("_EventListPartial", pagedEvents);
+                }
+                return View(pagedEvents);
+            }
 
             return StatusCode(500);
         }
@@ -67,13 +88,13 @@ namespace meeplematch_web.Controllers
         // GET: EventController/Details/5
         public IActionResult Details(int id)
         {
-            var httpClient = _httpClientFactory.CreateClient("MeepleMatch");
-            HttpResponseMessage response = httpClient.GetAsync($"events/{id}").Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    var @event = response.Content.ReadAsAsync<EventViewModel>().Result;
-                    return View(@event);
-                }
+            var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
+            HttpResponseMessage response = httpClient.GetAsync($"{apiUri}/{id}").Result;
+            if (response.IsSuccessStatusCode)
+            {
+                var @event = response.Content.ReadAsAsync<EventViewModel>().Result;
+                return View(@event);
+            }
 
             return NotFound();
         }
@@ -126,8 +147,8 @@ namespace meeplematch_web.Controllers
                 JsonSerializer.Serialize(viewModel),
                 Encoding.UTF8,
                 Application.Json);
-            var httpClient = _httpClientFactory.CreateClient("MeepleMatch");
-            using var response = await httpClient.PostAsync("events", postEvent);
+            var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
+            using var response = await httpClient.PostAsync(apiUri, postEvent);
 
             if (response.IsSuccessStatusCode)
             {
@@ -141,8 +162,8 @@ namespace meeplematch_web.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var httpClient = _httpClientFactory.CreateClient("MeepleMatch");
-            HttpResponseMessage response = httpClient.GetAsync($"events/{id}").Result;
+            var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
+            HttpResponseMessage response = httpClient.GetAsync($"{apiUri}/{id}").Result;
             if (response.IsSuccessStatusCode)
             {
                 var @event = response.Content.ReadAsAsync<EventViewModel>().Result;
@@ -161,8 +182,8 @@ namespace meeplematch_web.Controllers
                 return View(viewModel);
             }
 
-            var httpClient = _httpClientFactory.CreateClient("MeepleMatch");
-            var existingEventResponse = httpClient.GetAsync($"events/{id}").Result;
+            var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
+            var existingEventResponse = httpClient.GetAsync($"{apiUri}/{id}").Result;
             var existingEvent = existingEventResponse.Content.ReadAsAsync<EventViewModel>().Result;
 
             if (image != null && image.Length > 0)
@@ -192,7 +213,7 @@ namespace meeplematch_web.Controllers
                 Application.Json);
 
 
-            using var response = httpClient.PutAsync($"events/{viewModel.IdEvent}", putEvent).Result;
+            using var response = httpClient.PutAsync($"{apiUri}/{viewModel.IdEvent}", putEvent).Result;
 
             // Alt solution if the above doesn't work
             //using var response = httpClient.PutAsJsonAsync($"events/{viewModel.IdEvent}", viewModel).Result;
@@ -217,42 +238,11 @@ namespace meeplematch_web.Controllers
             }
         }
 
-
-        // GET: EventController/Delete/5
-        public IActionResult Delete(int id)
-        {
-            var httpClient = _httpClientFactory.CreateClient("MeepleMatch");
-            HttpResponseMessage response = httpClient.GetAsync($"events/{id}").Result;
-            if (response.IsSuccessStatusCode)
-            {
-                var @event = response.Content.ReadAsAsync<EventViewModel>().Result;
-                return View(@event);
-            }
-            else return NotFound();
-        }
-
-        // POST: EventController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id, EventViewModel eventDTO)
-        {
-            var httpClient = _httpClientFactory.CreateClient("MeepleMatch");
-            var response = httpClient.DeleteAsync($"events/{id}").Result;
-            if (response.IsSuccessStatusCode)
-            {
-                var @event = response.Content.ReadAsAsync<EventViewModel>().Result;
-                return RedirectToAction(nameof(Index));
-            }
-            else return NotFound();
-        }
-
-
-
         // GET: EventController/Delete/5
         public IActionResult Delete2(int id)
         {
-            var httpClient = _httpClientFactory.CreateClient("MeepleMatch");
-            HttpResponseMessage response = httpClient.GetAsync($"events/{id}").Result;
+            var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
+            HttpResponseMessage response = httpClient.GetAsync($"{apiUri}/{id}").Result;
             if (response.IsSuccessStatusCode)
             {
                 var @event = response.Content.ReadAsAsync<EventViewModel>().Result;
@@ -266,8 +256,8 @@ namespace meeplematch_web.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete2(int id, EventViewModel eventDTO)
         {
-            var httpClient = _httpClientFactory.CreateClient("MeepleMatch");
-            var response = httpClient.DeleteAsync($"events/{id}").Result;
+            var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
+            var response = httpClient.DeleteAsync($"{apiUri}/{id}").Result;
             if (response.IsSuccessStatusCode)
             {
                 return RedirectToAction(nameof(Index));

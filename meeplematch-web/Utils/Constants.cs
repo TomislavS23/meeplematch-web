@@ -12,6 +12,8 @@ public static class Constants
 
     public static readonly string PsqlConnectionString =
         EnvironmentUtils.Instance.GetEnvironmentVariable("PSQL_CONNECTION_STRING");
+
+    public static readonly string ApiName = "MeepleMatch";
     
     //// JWT
     //public static readonly string SecurityAlgorithm = SecurityAlgorithms.HmacSha256;

@@ -1,4 +1,5 @@
 using meeplematch_web.Mapping;
+using meeplematch_web.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace meeplematch_web;
@@ -17,7 +18,7 @@ public class Program
         //builder.Services.AddDbContext<MeepleMatchContext>(
         //    options => options.UseNpgsql(Constants.PsqlConnectionString));
 
-        builder.Services.AddHttpClient("MeepleMatch", httpClient =>
+        builder.Services.AddHttpClient(Constants.ApiName, httpClient =>
         {
             string apiUrl = "http://localhost:5202/api/meeplematch/";
             //string apiUrl = "https://localhost:7230/api/meeplematch/";
