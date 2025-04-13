@@ -1,8 +1,8 @@
 using meeplematch_api.Model;
-using meeplematch_api.Repository;
-using meeplematch_api.Service;
 using meeplematch_api.Utils;
+using meeplematch_web.Interfaces;
 using meeplematch_web.Mapping;
+using meeplematch_web.Service;
 using Microsoft.EntityFrameworkCore;
 
 namespace meeplematch_web;
@@ -16,8 +16,11 @@ public class Program
         // Add services to the container.
         builder.Services.AddControllersWithViews();
 
-        builder.Services.AddScoped<IEventRepository, EventRepository>();
-        builder.Services.AddScoped<IUserRepository, UserRepository>();
+        //builder.Services.AddScoped<IEventRepository, EventRepository>();
+        //builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+        builder.Services.AddHttpClient<IEventApiService, EventApiService>();
+        builder.Services.AddHttpClient<IUserApiService, UserApiService>();
 
         builder.Services.AddAutoMapper(typeof(MappingProfile));
 
