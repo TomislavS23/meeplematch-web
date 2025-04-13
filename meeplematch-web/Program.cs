@@ -21,6 +21,7 @@ public class Program
 
         builder.Services.AddHttpClient<IEventApiService, EventApiService>();
         builder.Services.AddHttpClient<IUserApiService, UserApiService>();
+        builder.Services.AddHttpClient<IAuthService, AuthService>();
 
         builder.Services.AddAutoMapper(typeof(MappingProfile));
 
