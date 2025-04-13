@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using meeplematch_api.Model;
-using meeplematch_api.Service;
-using Microsoft.EntityFrameworkCore;
-using meeplematch_api.Repository;
-using meeplematch_api.DTO;
+using meeplematch_web.DTO;
 using AutoMapper;
 using meeplematch_web.Models;
+using meeplematch_web.Interfaces;
 
 namespace meeplematch_web.Controllers
 {
@@ -14,70 +11,65 @@ namespace meeplematch_web.Controllers
     public class EventController : Controller
     {
         private readonly ILogger<EventController> _logger;
-        private readonly IEventRepository _eventRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IEventApiService _eventService;
+        private readonly IUserApiService _userService;
         private readonly IMapper _mapper;
 
-        public EventController(ILogger<EventController> logger, IEventRepository eventRepository, IUserRepository userRepository, IMapper mapper)
+        public EventController(ILogger<EventController> logger, IEventApiService eventService, 
+            IUserApiService userService, IMapper mapper)
         {
             // PR TEST
             _logger = logger;
-            _eventRepository = eventRepository;
-            _userRepository = userRepository;
+            _eventService = eventService;
+            _userService = userService;
             _mapper = mapper;
         }
 
-        public IActionResult Index(string search = "", int page = 1, int pageSize = 12)
+        public async Task<IActionResult> Index(string search = "", int page = 1, int pageSize = 12)
         {
-            var events = string.IsNullOrEmpty(search)
-                ? _eventRepository.FindAll()
-                : _eventRepository.FindAll()
-                    .Where(e => e.Name.ToLower().Contains(search.ToLower()) || e.Game.ToLower().Contains(search.ToLower()));
+            var allEvents = await _eventService.GetAllAsync();
 
-            var pagedEvents = events
+            if (!string.IsNullOrEmpty(search))
+            {
+                allEvents = allEvents
+                    .Where(e => e.Name.ToLower().Contains(search.ToLower()) || e.Game.ToLower().Contains(search.ToLower()))
+                    .ToList();
+            }
+
+            var pagedEvents = allEvents
                 .OrderBy(e => e.EventDate)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
 
-            var totalItems = events.Count();
-            var viewModel = _mapper.Map<List<EventViewModel>>(pagedEvents);
+            var viewModels = _mapper.Map<List<EventViewModel>>(pagedEvents);
 
-            foreach (var ev in viewModel)
+            foreach (var ev in viewModels)
             {
-                var userDto = _userRepository.GetUser(ev.CreatedBy);
-                ev.CreatedByNavigation = new User
-                {
-                    Username = userDto.Username 
-                };
+                var publicUser = await _userService.GetPublicUserAsync(ev.CreatedBy);
+                ev.CreatedByNavigation = new UserViewModel { Username = publicUser?.Username ?? "Unknown" };
             }
 
             ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            ViewBag.TotalPages = (int)Math.Ceiling((double)allEvents.Count / pageSize);
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-            {
-                return PartialView("_EventListPartial", viewModel);
-            }
+                return PartialView("_EventListPartial", viewModels);
 
-            return View(viewModel);
+            return View(viewModels);
         }
 
         // GET: EventController/Details/5
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var @event = _eventRepository.FindById(id);
-            if (@event is null) return NotFound();
+            var dto = await _eventService.GetByIdAsync(id);
+            if (dto == null) return NotFound();
 
-            var eventViewModel = _mapper.Map<EventViewModel>(@event);
+            var viewModel = _mapper.Map<EventViewModel>(dto);
+            var publicUser = await _userService.GetPublicUserAsync(viewModel.CreatedBy);
+            viewModel.CreatedByNavigation = new UserViewModel { Username = publicUser?.Username ?? "Unknown" };
 
-            var userDto = _userRepository.GetUser(eventViewModel.CreatedBy);
-            eventViewModel.CreatedByNavigation = new User
-            {
-                Username = userDto.Username
-            };
-
-            return View(eventViewModel);
+            return View(viewModel);
         }
 
         // GET: EventController/Create
@@ -89,153 +81,65 @@ namespace meeplematch_web.Controllers
         // POST: EventController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(EventViewModel viewModel, IFormFile image)
+        public async Task<IActionResult> Create(EventViewModel viewModel, IFormFile image)
         {
             if (!ModelState.IsValid)
             {
-                foreach (var kvp in ModelState)
-                {
-                    var field = kvp.Key;
-                    var errors = kvp.Value.Errors;
-                    foreach (var error in errors)
-                    {
-                        _logger.LogError($"Validation error in '{field}': {error.ErrorMessage}");
-                    }
-                }
-
                 return View(viewModel);
             }
 
             if (image != null && image.Length > 0)
             {
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "pic_uploads");
-                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
+                var fileName = Guid.NewGuid() + Path.GetExtension(image.FileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "pic_uploads", fileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    image.CopyTo(stream);
-                }
+                    await image.CopyToAsync(stream);
 
-                viewModel.ImagePath = $"/assets/pic_uploads/{uniqueFileName}";
+                viewModel.ImagePath = $"/assets/pic_uploads/{fileName}";
             }
 
-            var eventDto = _mapper.Map<EventDTO>(viewModel);
+            var dto = _mapper.Map<EventDTO>(viewModel);
+            dto.CreatedAt = DateTime.UtcNow;
+            dto.CreatedBy = 2; // temporary until login is done
 
-            eventDto.CreatedBy = 2; // hardcoded until login is implemented
-            eventDto.CreatedAt = DateTime.UtcNow;
-
-            _eventRepository.Save(eventDto);
+            await _eventService.CreateAsync(dto);
 
             return RedirectToAction(nameof(Index));
         }
 
         // GET: EventController/Edit/5
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var @event = _eventRepository.FindById(id);
-            if (@event is null) return NotFound();
-            var eventViewModel = _mapper.Map<EventViewModel>(@event);
-            return View(eventViewModel);
+            var dto = await _eventService.GetByIdAsync(id);
+            if (dto == null) return NotFound();
+
+            var viewModel = _mapper.Map<EventViewModel>(dto);
+            return View(viewModel);
         }
 
         // POST: EventController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, EventViewModel viewModel, IFormFile image)
+        public async Task<IActionResult> Edit(int id, EventViewModel viewModel, IFormFile image)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(viewModel);
-            }
-
-            var existingEvent = _eventRepository.FindById(id);
-            if (existingEvent == null)
-            {
-                return NotFound();
-            }
+            if (!ModelState.IsValid) return View(viewModel);
 
             if (image != null && image.Length > 0)
             {
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "pic_uploads");
-                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
+                var fileName = Guid.NewGuid() + Path.GetExtension(image.FileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "pic_uploads", fileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    image.CopyTo(stream);
-                }
+                    await image.CopyToAsync(stream);
 
-                viewModel.ImagePath = $"/assets/pic_uploads/{uniqueFileName}";
-            }
-            else
-            {
-                viewModel.ImagePath = existingEvent.ImagePath;
+                viewModel.ImagePath = $"/assets/pic_uploads/{fileName}";
             }
 
-            var eventDto = _mapper.Map<EventDTO>(viewModel);
-            eventDto.UpdatedAt = DateTime.UtcNow;
+            var dto = _mapper.Map<EventDTO>(viewModel);
+            dto.UpdatedAt = DateTime.UtcNow;
 
-            _eventRepository.Update(eventDto, id);
+            await _eventService.UpdateAsync(id, dto);
 
             return RedirectToAction(nameof(Index));
-        }
-
-
-        // GET: EventController/Delete/5
-        public IActionResult Delete(int id)
-        {
-            var @event = _eventRepository.FindById(id);
-            if (@event is null) return NotFound();
-            var eventViewModel = _mapper.Map<EventViewModel>(@event);
-            return View(eventViewModel);
-        }
-
-        // POST: EventController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id, EventDTO eventDTO)
-        {
-            try
-            {
-                if (_eventRepository.FindById(id) is null) return NotFound();
-                _eventRepository.Delete(id);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                //return RedirectToAction(nameof(Details), id);
-            }
-                return RedirectToAction(nameof(Index));
-        }
-
-
-
-        // GET: EventController/Delete/5
-        public IActionResult Delete2(int id)
-        {
-            var @event = _eventRepository.FindById(id);
-            if (@event is null) return NotFound();
-            var eventViewModel = _mapper.Map<EventViewModel>(@event);
-            return View(eventViewModel);
-        }
-
-        // POST: EventController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Delete2(int id, EventDTO eventDTO)
-        {
-            try
-            {
-                if (_eventRepository.FindById(id) is null) return NotFound();
-                _eventRepository.Delete(id);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                //return RedirectToAction(nameof(Details), id);
-            }
-                return RedirectToAction(nameof(Index));
         }
     }
 }
