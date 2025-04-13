@@ -29,6 +29,7 @@ public class Program
         builder.Services.AddHttpClient("MeepleMatch", httpClient =>
         {
             string apiUrl = "http://localhost:5202/api/meeplematch/";
+            //string apiUrl = "https://localhost:7230/api/meeplematch/";
             httpClient.BaseAddress = new Uri(apiUrl);
         });
 
