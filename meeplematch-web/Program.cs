@@ -1,7 +1,3 @@
-using meeplematch_api.Model;
-using meeplematch_api.Repository;
-using meeplematch_api.Service;
-using meeplematch_api.Utils;
 using meeplematch_web.Mapping;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,17 +12,15 @@ public class Program
         // Add services to the container.
         builder.Services.AddControllersWithViews();
 
-        builder.Services.AddScoped<IEventRepository, EventRepository>();
-        builder.Services.AddScoped<IUserRepository, UserRepository>();
-
         builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-        builder.Services.AddDbContext<MeepleMatchContext>(
-            options => options.UseNpgsql(Constants.PsqlConnectionString));
+        //builder.Services.AddDbContext<MeepleMatchContext>(
+        //    options => options.UseNpgsql(Constants.PsqlConnectionString));
 
         builder.Services.AddHttpClient("MeepleMatch", httpClient =>
         {
             string apiUrl = "http://localhost:5202/api/meeplematch/";
+            //string apiUrl = "https://localhost:7230/api/meeplematch/";
             httpClient.BaseAddress = new Uri(apiUrl);
         });
 

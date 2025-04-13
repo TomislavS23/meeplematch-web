@@ -24,12 +24,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="meeplematch-api">
-        <HintPath>..\..\meeplematch-api\meeplematch-api\bin\Debug\net8.0\meeplematch-api.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
-    <ItemGroup>
       <Folder Include="wwwroot\assets\pic_uploads\" />
     </ItemGroup>
 

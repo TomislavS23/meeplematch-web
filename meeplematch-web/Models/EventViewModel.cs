@@ -1,5 +1,4 @@
-﻿using meeplematch_api.Model;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 
 namespace meeplematch_web.Models
@@ -38,15 +37,5 @@ namespace meeplematch_web.Models
         public string? Description { get; set; }
         public string? ImagePath { get; set; }
 
-        [ValidateNever]
-        public virtual User CreatedByNavigation { get; set; } = null!;
-
-        public virtual ICollection<EventComment> EventComments { get; set; } = new List<EventComment>();
-
-        public virtual ICollection<EventParticipant> EventParticipants { get; set; } = new List<EventParticipant>();
-
-        public virtual ICollection<EventRating> EventRatings { get; set; } = new List<EventRating>();
-
-        public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
     }
 }
