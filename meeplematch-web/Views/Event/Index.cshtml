@@ -20,7 +20,7 @@
         <div class="row g-4" id="eventList">
             @foreach (var item in Model)
             {
-                <div class="col-12 col-sm-6 col-lg-3">
+                <div class="one-card col-12 col-sm-6 col-lg-3">
                     <div class="card h-100 shadow-sm" data-aos="flip-right" data-aos-duration="1500">
                         <img src="@(!string.IsNullOrEmpty(item.ImagePath) ? item.ImagePath : Url.Content("~/assets/images/game_night_placeholder.png"))"
                              class="card-img-top event-img" />
@@ -44,7 +44,7 @@
                             <div class="mt-2 text-center">
                                 <a asp-action="Details" asp-route-id="@item.IdEvent" class="btn btn-sm btn-outline-primary">Details</a>
                                 <a asp-action="Edit" asp-route-id="@item.IdEvent" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                @* <a class="btn btn-sm btn-outline-danger" href="/Event/Delete/@item.IdEvent">Delete</a> *@
+                                <a class="btn btn-sm btn-outline-danger" href="/Event/Delete2/@item.IdEvent">Delete</a>
                             </div>
                         </div>
                     </div>
@@ -66,7 +66,6 @@
 
     </div>
 </div>
-
 @section Scripts {
     <script>
         const searchInput = document.getElementById("searchInput");
@@ -89,9 +88,17 @@
                 .then(data => {
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(data, "text/html");
-                    const updatedCards = doc.querySelector("#eventList").innerHTML;
-                    document.querySelector("#eventList").innerHTML = updatedCards;
-                    AOS.refresh(); 
+                    // const updatedCards = doc.querySelectorAll(".col-12.col-sm-6.col-lg-3");
+                    const updatedCards = doc.querySelectorAll(".one-card");
+
+                    const eventList = document.querySelector("#eventList");
+                    eventList.innerHTML = "";
+
+                    updatedCards.forEach(card => {
+                        eventList.appendChild(card);
+                    });
+
+                    AOS.refresh();
                 })
                 .catch(error => console.error("Error fetching events:", error));
         });

@@ -133,38 +133,38 @@
         <h2 class="text-white fw-bold mb-4">Newest Events</h2>
 
         <div class="row row-cols-1 row-cols-md-3 g-4">
-            @foreach (var item in Model)
-            {
-                <div class="col">
-                    <div class="card h-100 shadow-sm"
-                         data-aos="flip-right" data-aos-duration="2000">
+            @foreach (var item in Model) 
+            { 
+                 <div class="col"> 
+                     <div class="card h-100 shadow-sm" 
+                          data-aos="flip-right" data-aos-duration="2000"> 
 
-                        <img src="@(!string.IsNullOrEmpty(item.ImagePath) ? item.ImagePath : Url.Content("~/assets/images/game_night_placeholder.png"))"
-                             class="card-img-top"
-                             style="height: 200px; object-fit: cover;"
-                             alt="Event Image" />
+                         <img src="@(!string.IsNullOrEmpty(item.ImagePath) ? item.ImagePath : Url.Content("~/assets/images/game_night_placeholder.png"))" 
+                              class="card-img-top" 
+                              style="height: 200px; object-fit: cover;" 
+                              alt="Event Image" /> 
 
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-semibold text-black">@item.Name</h5>
-                            <p class="mb-1 small text-secondary">@item.EventDate.ToString("ddd, dd MMMM – HH:mm")</p>
-                            <p class="mb-1 small text-black"><strong>Hosted by:</strong> @(item.CreatedByNavigation?.Username ?? "Unknown")</p>
+                         <div class="card-body d-flex flex-column"> 
+                             <h5 class="card-title fw-semibold text-black">@item.Name</h5> 
+                             <p class="mb-1 small text-secondary">@item.EventDate.ToString("ddd, dd MMMM – HH:mm")</p> 
+                              <p class="mb-1 small text-black"><strong>Hosted by:</strong> @(item.CreatedByNavigation?.Username ?? "Unknown")</p> 
 
-                            @if (!string.IsNullOrWhiteSpace(item.Description))
-                            {
-                                <p class="card-text small text-secondary">
-                                    @item.Description.Substring(0, Math.Min(100, item.Description.Length))...
-                                </p>
-                            }
+                             @if (!string.IsNullOrWhiteSpace(item.Description)) 
+                             { 
+                                 <p class="card-text small text-secondary"> 
+                                     @item.Description.Substring(0, Math.Min(100, item.Description.Length))... 
+                                 </p> 
+                             } 
 
-                            <p class="fw-bold small mt-2 text-black">4646/@item.Capacity players registered</p>  @* fix *@
+                             <p class="fw-bold small mt-2 text-black">4646/@item.Capacity players registered</p>   @*fix *@
 
-                            <div class="text-center mt-auto pt-3">
-                                <a asp-controller="Account" asp-action="Login" class="btn btn-dark">Learn more</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
+                             <div class="text-center mt-auto pt-3"> 
+                                 <a asp-controller="Account" asp-action="Login" class="btn btn-dark">Learn more</a> 
+                             </div> 
+                         </div> 
+                     </div> 
+                 </div>
+             }
         </div>
     </div>
 </div>

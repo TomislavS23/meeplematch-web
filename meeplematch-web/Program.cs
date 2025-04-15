@@ -1,8 +1,7 @@
-using meeplematch_api.Model;
-using meeplematch_api.Utils;
 using meeplematch_web.Interfaces;
 using meeplematch_web.Mapping;
 using meeplematch_web.Service;
+using meeplematch_web.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace meeplematch_web;
@@ -19,14 +18,21 @@ public class Program
         //builder.Services.AddScoped<IEventRepository, EventRepository>();
         //builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-        builder.Services.AddHttpClient<IEventApiService, EventApiService>();
-        builder.Services.AddHttpClient<IUserApiService, UserApiService>();
-        builder.Services.AddHttpClient<IAuthService, AuthService>();
+        //builder.Services.AddHttpClient<IEventApiService, EventApiService>();
+        //builder.Services.AddHttpClient<IUserApiService, UserApiService>();
+        //builder.Services.AddHttpClient<IAuthService, AuthService>();
 
         builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-        builder.Services.AddDbContext<MeepleMatchContext>(
-            options => options.UseNpgsql(Constants.PsqlConnectionString));
+        //builder.Services.AddDbContext<MeepleMatchContext>(
+        //    options => options.UseNpgsql(Constants.PsqlConnectionString));
+
+        builder.Services.AddHttpClient(Constants.ApiName, httpClient =>
+        {
+            string apiUrl = "http://localhost:5202/api/meeplematch/";
+            //string apiUrl = "https://localhost:7230/api/meeplematch/";
+            httpClient.BaseAddress = new Uri(apiUrl);
+        });
 
         var app = builder.Build();
 

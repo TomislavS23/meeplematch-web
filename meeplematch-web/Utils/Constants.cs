@@ -12,10 +12,13 @@ public static class Constants
 
     public static readonly string PsqlConnectionString =
         EnvironmentUtils.Instance.GetEnvironmentVariable("PSQL_CONNECTION_STRING");
-    
+
+
+    public static readonly string ApiName = "MeepleMatch";
+    public static string JwtToken = string.Empty;
     //// JWT
     //public static readonly string SecurityAlgorithm = SecurityAlgorithms.HmacSha256;
-    
+
     //// ENCRYPTION
     //public static readonly int IterationCount = 700_001;
     //public static readonly HashAlgorithmName HashAlgorithm = HashAlgorithmName.SHA256;

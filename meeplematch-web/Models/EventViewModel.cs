@@ -1,6 +1,7 @@
-﻿using meeplematch_api.Model;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
+using System.Composition;
+using System.Diagnostics.Tracing;
 
 namespace meeplematch_web.Models
 {
@@ -40,13 +41,12 @@ namespace meeplematch_web.Models
 
         [ValidateNever]
         public virtual UserViewModel CreatedByNavigation { get; set; } = null!;
+        public virtual ICollection<EventCommentViewModel> EventComments { get; set; } = new List<EventCommentViewModel>();
 
-        public virtual ICollection<EventComment> EventComments { get; set; } = new List<EventComment>();
+        public virtual ICollection<EventParticipantViewModel> EventParticipants { get; set; } = new List<EventParticipantViewModel>();
 
-        public virtual ICollection<EventParticipant> EventParticipants { get; set; } = new List<EventParticipant>();
+        public virtual ICollection<EventRatingViewModel> EventRatings { get; set; } = new List<EventRatingViewModel>();
 
-        public virtual ICollection<EventRating> EventRatings { get; set; } = new List<EventRating>();
-
-        public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
+        public virtual ICollection<ReportViewModel> Reports { get; set; } = new List<ReportViewModel>();
     }
 }
