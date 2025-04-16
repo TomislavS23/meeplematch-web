@@ -54,6 +54,7 @@ using Microsoft.AspNetCore.Mvc;
 using meeplematch_web.Models;
 using AutoMapper;
 using meeplematch_web.Utils;
+using meeplematch_web.DTO;
 
 namespace meeplematch_web.Controllers;
 
@@ -77,6 +78,16 @@ public class HomeController : Controller
         if (response.IsSuccessStatusCode)
         {
             var events = await response.Content.ReadAsAsync<List<EventViewModel>>();
+            foreach (var ev in events)
+            {
+                var userResponse = await httpClient.GetAsync($"user/public/{ev.CreatedBy}");
+                if (userResponse.IsSuccessStatusCode)
+                {
+                    var user = await userResponse.Content.ReadAsAsync<PublicUserViewModel>();
+                    ev.CreatedByNavigation = _mapper.Map<PublicUserViewModel>(user ?? new PublicUserViewModel { Username = "Unknown" });
+                }
+            }
+
             var latestEvents = events
                 .OrderByDescending(e => e.CreatedAt)
                 .Take(9)

@@ -42,7 +42,7 @@ namespace meeplematch_web.Models
         public string? ImagePath { get; set; }
 
         [ValidateNever]
-        public virtual UserViewModel CreatedByNavigation { get; set; } = null!;
+        public virtual PublicUserViewModel CreatedByNavigation { get; set; } = null!;
         public virtual ICollection<EventCommentViewModel> EventComments { get; set; } = new List<EventCommentViewModel>();
 
         public virtual ICollection<EventParticipantViewModel> EventParticipants { get; set; } = new List<EventParticipantViewModel>();
