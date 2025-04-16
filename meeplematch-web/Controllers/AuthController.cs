@@ -42,7 +42,10 @@ namespace meeplematch_web.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                Constants.JwtToken = content;
+                //Constants.JwtToken = content;
+                //HttpContext context = HttpContext.Connection.Cur
+                //HttpContext.Session.Set
+                HttpContext.Session.SetString(Constants.JwtTokenFromSession, content);
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
 
@@ -83,7 +86,8 @@ namespace meeplematch_web.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var contentResponse = await response.Content.ReadAsStringAsync();
-                Constants.JwtToken = contentResponse;
+                //Constants.JwtToken = contentResponse;
+                HttpContext.Session.SetString(Constants.JwtTokenFromSession, contentResponse);
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
             //var dto = new RegisterDTO { Username = username, Email = email, Password = password, RoleId = 1 };

@@ -264,7 +264,8 @@ namespace meeplematch_web.Controllers
                 foreach (var ev in pagedEvents)
                 {
                     // Fix required: no need for authentication to view organizer's name
-                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Constants.JwtToken);
+                    //httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Constants.JwtToken);
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString(Constants.JwtTokenFromSession));
                     var userResult = httpClient.GetAsync($"user/{ev.CreatedBy}").Result;
                     if (userResult.IsSuccessStatusCode)
                     {
@@ -355,6 +356,16 @@ namespace meeplematch_web.Controllers
 
                 viewModel.ImagePath = $"/assets/pic_uploads/{uniqueFileName}";
             }
+
+            // The following is a test
+            // TODO: CreatedBy should be set to the logged-in user
+            //var jwtToken = HttpContext.Session.GetString(Constants.JwtTokenFromSession);
+            //var token = JwtUtils.ConvertJwtStringToJwtSecurityToken(jwtToken);
+            //var payload = JwtUtils.DecodeJwt(token);
+
+            //var username = payload.FirstOrDefault(x => x.Key.Contains("name")).Value.ToString();
+
+            //Console.WriteLine(username);
 
             viewModel.CreatedBy = 1;
             viewModel.CreatedAt = DateTime.UtcNow;

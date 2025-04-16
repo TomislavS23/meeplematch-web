@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using meeplematch_web.Validation;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.Composition;
 using System.Diagnostics.Tracing;
@@ -20,6 +21,7 @@ namespace meeplematch_web.Models
         public string Location { get; set; } = null!;
 
         [Display(Name = "Event Date")]
+        [DateValidation]
         public DateTime EventDate { get; set; }
 
         public int? Capacity { get; set; }
