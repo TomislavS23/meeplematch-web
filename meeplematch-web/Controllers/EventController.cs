@@ -266,22 +266,11 @@ namespace meeplematch_web.Controllers
                     // Fix required: no need for authentication to view organizer's name
                     //httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Constants.JwtToken);
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString(Constants.JwtTokenFromSession));
-                    var userResult = httpClient.GetAsync($"user/{ev.CreatedBy}").Result;
+                    var userResult = httpClient.GetAsync($"user/public/{ev.CreatedBy}").Result;
                     if (userResult.IsSuccessStatusCode)
                     {
-                        var users = userResult.Content.ReadAsAsync<List<UserViewModel>>().Result;
-                        var user = users.Where(u => u.IdUser == ev.CreatedBy).FirstOrDefault();
-                        if (user != null)
-                        {
-                            ev.CreatedByNavigation = new UserViewModel
-                            {
-                                Username = user.Username
-                            };
-                        }
-                        else
-                        {
-                            _logger.LogError($"User with ID {ev.CreatedBy} not found in the response.");
-                        }
+                        var user = userResult.Content.ReadAsAsync<PublicUserViewModel>().Result;
+                        ev.CreatedByNavigation = _mapper.Map<PublicUserViewModel>(user ?? new PublicUserViewModel { Username = "Unknown" });
                     }
                     else
                     {
@@ -310,6 +299,15 @@ namespace meeplematch_web.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var @event = response.Content.ReadAsAsync<EventViewModel>().Result;
+                if (@event.CreatedBy != 0)
+                {
+                    HttpResponseMessage userResponse = httpClient.GetAsync($"user/public/{@event.CreatedBy}").Result;
+                    if (userResponse.IsSuccessStatusCode)
+                    {
+                        var user = userResponse.Content.ReadAsAsync<PublicUserViewModel>().Result;
+                        @event.CreatedByNavigation = _mapper.Map<PublicUserViewModel>(user ?? new PublicUserViewModel { Username = "Unknown" });
+                    }
+                }
                 return View(@event);
             }
 
