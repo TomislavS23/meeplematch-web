@@ -15,6 +15,15 @@ public class Program
         // Add services to the container.
         builder.Services.AddControllersWithViews();
 
+        builder.Services.AddDistributedMemoryCache();
+
+        builder.Services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromSeconds(10);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+        });
+
         //builder.Services.AddScoped<IEventRepository, EventRepository>();
         //builder.Services.AddScoped<IUserRepository, UserRepository>();
 
@@ -50,6 +59,8 @@ public class Program
         app.UseRouting();
 
         app.UseAuthorization();
+
+        app.UseSession();
 
         app.MapControllerRoute(
             name: "default",

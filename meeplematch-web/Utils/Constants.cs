@@ -16,6 +16,7 @@ public static class Constants
 
     public static readonly string ApiName = "MeepleMatch";
     public static string JwtToken = string.Empty;
+    public static readonly string JwtTokenFromSession = "JwtToken";
     //// JWT
     //public static readonly string SecurityAlgorithm = SecurityAlgorithms.HmacSha256;
 
