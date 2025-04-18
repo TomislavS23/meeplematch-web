@@ -46,6 +46,15 @@ namespace meeplematch_web.Controllers
                 //HttpContext context = HttpContext.Connection.Cur
                 //HttpContext.Session.Set
                 HttpContext.Session.SetString(Constants.JwtTokenFromSession, content);
+
+
+                var jwtToken = HttpContext.Session.GetString(Constants.JwtTokenFromSession);
+                var token = JwtUtils.ConvertJwtStringToJwtSecurityToken(jwtToken);
+                var payload = JwtUtils.DecodeJwt(token);
+
+                var username1 = payload.FirstOrDefault(x => x.Key.Contains("name")).Value.ToString();
+                Console.WriteLine(username1);
+
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
 

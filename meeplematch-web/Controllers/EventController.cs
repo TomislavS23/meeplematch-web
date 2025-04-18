@@ -357,22 +357,38 @@ namespace meeplematch_web.Controllers
 
             // The following is a test
             // TODO: CreatedBy should be set to the logged-in user
-            //var jwtToken = HttpContext.Session.GetString(Constants.JwtTokenFromSession);
-            //var token = JwtUtils.ConvertJwtStringToJwtSecurityToken(jwtToken);
-            //var payload = JwtUtils.DecodeJwt(token);
+            var jwtToken = HttpContext.Session.GetString(Constants.JwtTokenFromSession);
+            var token = JwtUtils.ConvertJwtStringToJwtSecurityToken(jwtToken);
+            var payload = JwtUtils.DecodeJwt(token);
 
-            //var username = payload.FirstOrDefault(x => x.Key.Contains("name")).Value.ToString();
+            var username = payload.FirstOrDefault(x => x.Key.Contains("name")).Value.ToString();
 
-            //Console.WriteLine(username);
+            Console.WriteLine(username);
 
-            viewModel.CreatedBy = 1;
+
+            var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString(Constants.JwtTokenFromSession));
+            if (httpClient.DefaultRequestHeaders.Authorization == null)
+            {
+                _logger.LogError("Authorization header is null");
+            }
+            else
+            {
+                _logger.LogInformation($"Authorization header: {httpClient.DefaultRequestHeaders.Authorization}");
+            }
+
+            var usersResult = httpClient.GetAsync($"user/").Result;
+
+            var user = usersResult.Content.ReadAsAsync<List<PublicUserViewModel>>().Result.Where(u => u.Username.Equals(username)).FirstOrDefault();
+
+            //viewModel.CreatedBy = 1;
+            viewModel.CreatedBy = user.IdUser;
             viewModel.CreatedAt = DateTime.UtcNow;
 
             var postEvent = new StringContent(
                 JsonSerializer.Serialize(viewModel),
                 Encoding.UTF8,
                 Application.Json);
-            var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
             using var response = await httpClient.PostAsync(apiUri, postEvent);
 
             if (response.IsSuccessStatusCode)
