@@ -1,9 +1,7 @@
-﻿using meeplematch_web.DTO;
-using meeplematch_web.Interfaces;
-using meeplematch_web.Models;
-using meeplematch_web.Utils;
-using Microsoft.AspNetCore.Http;
+﻿using meeplematch_web.Utils;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -11,13 +9,8 @@ namespace meeplematch_web.Controllers
 {
     public class AuthController : Controller
     {
-        //private readonly IAuthService _authService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly string apiUrl = "auth";
-        //public AuthController(IAuthService authService)
-        //{
-        //    _authService = authService;
-        //}
         public AuthController(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
@@ -34,39 +27,43 @@ namespace meeplematch_web.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
             var response = await httpClient.GetAsync($"{apiUrl}/login?username={username}&password={password}");
-            if (!response.IsSuccessStatusCode)
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
+                if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Testing")
+                {
+                    return Unauthorized("Invalid credentials");
+                }
                 ViewData["Error"] = "Invalid credentials";
+                TempData["toast_error"] = "Invalid credentials";
                 return View();
             }
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                //Constants.JwtToken = content;
-                //HttpContext context = HttpContext.Connection.Cur
-                //HttpContext.Session.Set
                 HttpContext.Session.SetString(Constants.JwtTokenFromSession, content);
 
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, username),
+                    new Claim(ClaimTypes.Role, "User")
+                };
 
-                var jwtToken = HttpContext.Session.GetString(Constants.JwtTokenFromSession);
-                var token = JwtUtils.ConvertJwtStringToJwtSecurityToken(jwtToken);
-                var payload = JwtUtils.DecodeJwt(token);
+                var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
 
-                var username1 = payload.FirstOrDefault(x => x.Key.Contains("name")).Value.ToString();
-                Console.WriteLine(username1);
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                };
+
+                await HttpContext.SignInAsync("MyCookieAuth", new ClaimsPrincipal(claimsIdentity), authProperties);
+
+                TempData["toast_success"] = "Login successful";
 
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
 
             return View();
-            //var result = await _authService.LoginAsync(username, password);
-            //if (result == null)
-            //{
-            //    ViewData["Error"] = "Invalid credentials";
-            //    return View();
-            //}
-
-            //return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
@@ -90,22 +87,32 @@ namespace meeplematch_web.Controllers
             if (!response.IsSuccessStatusCode)
             {
                 ViewData["Error"] = "Registration failed";
+                TempData["toast_error"] = "Registration failed";
                 return View("Login");
             }
             if (response.IsSuccessStatusCode)
             {
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, username),
+                    new Claim(ClaimTypes.Role, "User")
+                };
+
+                var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                };
+
+                await HttpContext.SignInAsync("MyCookieAuth", new ClaimsPrincipal(claimsIdentity), authProperties);
+
                 var contentResponse = await response.Content.ReadAsStringAsync();
                 //Constants.JwtToken = contentResponse;
                 HttpContext.Session.SetString(Constants.JwtTokenFromSession, contentResponse);
+                TempData["toast_success"] = "Successful registration! You are now logged in.";
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
-            //var dto = new RegisterDTO { Username = username, Email = email, Password = password, RoleId = 1 };
-            //var result = await _authService.RegisterAsync(dto);
-            //if (result == null)
-            //{
-            //    ViewData["Error"] = "Registration failed";
-            //    return View("Login");
-            //}
 
             return View();
         }
