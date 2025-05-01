@@ -1,12 +1,9 @@
-using meeplematch_web.Interfaces;
 using meeplematch_web.Mapping;
-using meeplematch_web.Service;
 using meeplematch_web.Utils;
-using Microsoft.EntityFrameworkCore;
 
 namespace meeplematch_web;
 
-public class Program
+public partial class Program
 {
     public static void Main(string[] args)
     {
@@ -43,12 +40,24 @@ public class Program
             httpClient.BaseAddress = new Uri(apiUrl);
         });
 
+        builder.Services.AddAuthentication("MyCookieAuth").AddCookie("MyCookieAuth", options =>
+            {
+                options.LoginPath = "/Auth/Login";
+                options.LogoutPath = "/Auth/Logout";
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                options.SlidingExpiration = true;
+            });
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
         {
-            app.UseExceptionHandler("/Home/Error");
+            app.UseExceptionHandler(new ExceptionHandlerOptions
+            {
+                ExceptionHandlingPath = "/Home/Error",
+                AllowStatusCode404Response = true
+            });
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
@@ -57,10 +66,11 @@ public class Program
         app.UseStaticFiles();
 
         app.UseRouting();
+        app.UseSession();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
-        app.UseSession();
 
         app.MapControllerRoute(
             name: "default",
