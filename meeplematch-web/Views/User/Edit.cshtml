@@ -1,0 +1,113 @@
+﻿@model meeplematch_web.Models.CreateUserViewModel
+
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<div class="container my-5">
+    <h2 class="mb-4 d-flex justify-content-between align-items-center">
+        <span>Edit User</span>
+    </h2>
+
+    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="JwtToken" value="@ViewBag.JwtToken" />
+        <input type="hidden" name="id" value="@Context.Request.RouteValues["id"]" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="text-center mb-4">
+            <input type="file" name="image" accept="image/*" class="d-none" id="imageUploadInput" />
+            <label for="imageUploadInput" style="cursor: pointer;" data-bs-toggle="tooltip" title="Click to upload a new profile picture">
+                <img id="imagePreview" src="@(Model.ImagePath ?? Url.Content("~/assets/images/neutral_profile.png"))"
+                     alt="Profile Image" class="img-thumbnail shadow"
+                     style="width: 100%; max-width: 200px; height: 200px; object-fit: cover;" />
+            </label>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="FirstName" class="form-label">First Name</label>
+                    <input asp-for="FirstName" class="form-control" placeholder="First name" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="LastName" class="form-label">Last Name</label>
+                    <input asp-for="LastName" class="form-control" placeholder="Last name" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="RoleId" class="form-label">Role</label>
+                    <select asp-for="RoleId" class="form-select">
+                        <option value="">Select Role</option>
+                        <option value="1" selected="@(Model.RoleId == 1)">User</option>
+                        <option value="2" selected="@(Model.RoleId == 2)">Admin</option>
+                    </select>
+                    <span asp-validation-for="RoleId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Username" class="form-label">Username</label>
+                    <input asp-for="Username" class="form-control" placeholder="Choose a username" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="form-label">Email</label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="example@email.com" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Password" class="form-label">New Password</label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Leave blank to keep current password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="IsMale" class="form-label">Gender</label>
+                    <select asp-for="IsMale" class="form-control">
+                        <option value="">Select</option>
+                        <option value="true" selected="@(Model.IsMale == true)">Male</option>
+                        <option value="false" selected="@(Model.IsMale == false)">Female</option>
+                    </select>
+                    <span asp-validation-for="IsMale" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <input type="submit" value="Save Changes" class="btn btn-primary" />
+            <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        const imageInput = document.getElementById('imageUploadInput');
+        const imagePreview = document.getElementById('imagePreview');
+
+        imageInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+}

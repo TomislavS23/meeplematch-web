@@ -26,6 +26,14 @@ namespace meeplematch_web.Models
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
+        public string? FirstName { get; set; }
+
+        public string? LastName { get; set; }
+
+        public string? ImagePath { get; set; }
+
+        public bool? IsMale { get; set; }
+
         [ValidateNever]
         public virtual ICollection<EventCommentViewModel> EventComments { get; set; } = new List<EventCommentViewModel>();
 

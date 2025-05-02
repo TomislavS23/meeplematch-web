@@ -2,6 +2,15 @@
     ViewData["Title"] = "About";
 }
 
+@section Styles {
+    <style>
+        #faqAccordion .accordion-button,
+        #faqAccordion .accordion-body {
+            font-family: 'Fredoka', sans-serif;
+        }
+    </style>
+}
+
 <div class="bg-gradient bg-danger text-white py-5 w-100 shadow-sm" data-aos="fade-up" data-aos-duration="1000">
     <div class="container">
         <div class="row align-items-center">
@@ -71,6 +80,84 @@
     </button>
 </div>
 
+<div class="bg-dark text-white d-flex justify-content-center align-items-center" style="height: 150px;"
+     data-aos="fade-up" data-aos-duration="1000">
+    <h4 class="display-6 text-center">Make your next board game night unforgettable.</h4>
+</div>
+
+<div class="bg-danger w-100 py-5" data-aos="fade-up" data-aos-duration="1000">
+    <div class="container">
+        <h2 class="text-white mb-4" style="font-weight: normal;">FAQ</h2>
+
+        <div class="accordion" id="faqAccordion">
+            <div class="accordion-item text-dark">
+                <h2 class="accordion-header" id="faq1">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                        What is MeepleMatch?
+                    </button>
+                </h2>
+                <div id="collapse1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        MeepleMatch is a student-built platform that helps board game enthusiasts connect, organize events, and track game nights.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item text-dark">
+                <h2 class="accordion-header" id="faq2">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                        How do I join a game night?
+                    </button>
+                </h2>
+                <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Register an account, browse upcoming events, and click “Participate” to join.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item text-dark">
+                <h2 class="accordion-header" id="faq3">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                        Is MeepleMatch free to use?
+                    </button>
+                </h2>
+                <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Absolutely! MeepleMatch is free for all users.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item text-dark">
+                <h2 class="accordion-header" id="faq4">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                        Can I invite friends who aren't registered?
+                    </button>
+                </h2>
+                <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Yes! You can share public event links, but registration is required to RSVP.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item text-dark">
+                <h2 class="accordion-header" id="faq5">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5">
+                        How do I delete my account?
+                    </button>
+                </h2>
+                <div id="collapse5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Go to your profile settings and click “Delete My Account” to exercise your right to be forgotten.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="bg-dark py-5 text-black" data-aos="fade-up" data-aos-duration="1000">
     <div class="container">
         <h2 class=" display-6 mb-4 text-white">Meet the Team</h2>
@@ -105,3 +192,6 @@
         </div>
     </div>
 </div>
+
+
+
