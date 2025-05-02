@@ -19,13 +19,14 @@ namespace meeplematch_web.Controllers
         }
 
         [HttpGet]
-        public ActionResult Login()
+        public ActionResult Login(string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
+        public async Task<IActionResult> Login(string username, string password, string? returnUrl = null)
         {
             var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
             var response = await httpClient.GetAsync($"{apiUrl}/login?username={username}&password={password}");
@@ -42,6 +43,10 @@ namespace meeplematch_web.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
+
+                ViewData["JwtToken"] = content;
+                ViewData["ReturnUrl"] = returnUrl ?? Url.Action("Index", "Home");
+
                 HttpContext.Session.SetString(Constants.JwtTokenFromSession, content);
 
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", content);
@@ -71,10 +76,9 @@ namespace meeplematch_web.Controllers
 
                 TempData["toast_success"] = "Login successful";
 
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return View("LoginSuccess");
             }
-
-            return View();
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
         [HttpPost]
@@ -119,13 +123,19 @@ namespace meeplematch_web.Controllers
                 await HttpContext.SignInAsync("MyCookieAuth", new ClaimsPrincipal(claimsIdentity), authProperties);
 
                 var contentResponse = await response.Content.ReadAsStringAsync();
-                //Constants.JwtToken = contentResponse;
                 HttpContext.Session.SetString(Constants.JwtTokenFromSession, contentResponse);
                 TempData["toast_success"] = "Successful registration! You are now logged in.";
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
-
             return View();
         }
+
+        [HttpGet]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear(); 
+            return RedirectToAction("Login", "Auth");
+        }
+
     }
 }

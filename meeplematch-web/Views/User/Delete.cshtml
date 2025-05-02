@@ -1,0 +1,36 @@
+﻿@model meeplematch_web.Models.CreateUserViewModel
+
+@{
+    ViewData["Title"] = "Delete User";
+}
+
+<div class="container my-5">
+    <h2 class="mb-4 text-danger">Delete User</h2>
+
+    <div class="row justify-content-center align-items-center mb-4">
+        <div class="col-md-4">
+            <img src="@(!string.IsNullOrEmpty(Model.ImagePath) ? Model.ImagePath : Url.Content("~/assets/images/neutral_profile.png"))"
+                 alt="Profile Image" class="img-thumbnail shadow"
+                 style="width: 100%; max-width: 400px; height: 300px; object-fit: cover;" />
+        </div>
+
+        <div class="col-md-6 text-center">
+            <div class="mb-2"><strong>Username:</strong> @Model.Username</div>
+            <div class="mb-2"><strong>Email:</strong> @Model.Email</div>
+            <div class="mb-2"><strong>First Name:</strong> @Model.FirstName</div>
+            <div class="mb-2"><strong>Last Name:</strong> @Model.LastName</div>
+            <div class="mb-2"><strong>Role:</strong> @(Model.RoleId == 2 ? "Admin" : "User")</div>
+            <div class="mb-2"><strong>Gender:</strong> @(Model.IsMale == null ? "Not set" : (Model.IsMale.Value ? "Male" : "Female"))</div>
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post" class="text-center">
+        <input type="hidden" name="id" value="@Context.Request.RouteValues["id"]" />
+        <input type="hidden" name="JwtToken" value="@ViewBag.JwtToken" />
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+    </form>
+</div>

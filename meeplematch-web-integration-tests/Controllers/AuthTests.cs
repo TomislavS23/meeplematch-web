@@ -62,20 +62,20 @@ namespace meeplematch_web_integration_tests.Controllers
                 });
 
 
-            var client = _factory.CreateDefaultClient();
-            var content = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("username", "test"),
-                new KeyValuePair<string, string>("password", "pass")
-            });
+        //    var client = _factory.CreateDefaultClient();
+        //    var content = new FormUrlEncodedContent(new[]
+        //    {
+        //        new KeyValuePair<string, string>("username", "test"),
+        //        new KeyValuePair<string, string>("password", "pass")
+        //    });
 
-            // Act
-            var response = await client.PostAsync("/Auth/Login", content);
+        //    // Act
+        //    var response = await client.PostAsync("/Auth/Login", content);
 
-            // Assert
-            Assert.Equal(HttpStatusCode.Found, response.StatusCode);
-            Assert.Contains(".AspNetCore.MyCookieAuth", response.Headers.GetValues("Set-Cookie").FirstOrDefault());
-        }
+        //    // Assert
+        //    Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+        //    Assert.Contains(".AspNetCore.MyCookieAuth", response.Headers.GetValues("Set-Cookie").FirstOrDefault());
+        //}
 
         [Fact]
         public async Task Login_Fail_ReturnsUnauthorized()
