@@ -50,6 +50,7 @@ namespace meeplematch_web.Controllers
                 var user = await (await httpClient.GetAsync($"user/{pubilcUser.IdUser}")).Content.ReadAsAsync<UserViewModel>();
                 //var users = await user.Content.ReadAsAsync<List<UserViewModel>>();
                 //var userContent = users.FirstOrDefault();
+
                 string role = user.RoleId == 1 ? "User" : "Admin";
 
                 var claims = new List<Claim>

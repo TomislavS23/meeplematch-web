@@ -239,6 +239,7 @@ namespace meeplematch_web.Controllers
             var existingEvent = await existingEventResponse.Content.ReadAsAsync<EventViewModel>();
 
             var userEditing = await (await httpClient.GetAsync($"user/public/{User.Identity.Name}")).Content.ReadAsAsync<PublicUserViewModel>();
+
             if (userEditing.IdUser != existingEvent.CreatedBy && !User.IsInRole("Admin"))
             {
                 TempData["toast_error"] = "An error occured while validating the user.";
