@@ -17,14 +17,14 @@ namespace meeplematch_web.Controllers
         }
 
         [HttpGet]
-        public ActionResult Login2(string? returnUrl = null)
+        public ActionResult Login(string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login2(string username, string password, string? returnUrl = null)
+        public async Task<IActionResult> Login(string username, string password, string? returnUrl = null)
         {
             var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
             var response = await httpClient.GetAsync($"{apiUrl}/login?username={username}&password={password}");
@@ -123,7 +123,7 @@ namespace meeplematch_web.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear(); 
-            return RedirectToAction("Login2", "Auth");
+            return RedirectToAction("Login", "Auth");
         }
 
     }

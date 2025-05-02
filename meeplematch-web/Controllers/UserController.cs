@@ -88,7 +88,7 @@ namespace meeplematch_web.Controllers
             var jwt = HttpContext.Session.GetString(Constants.JwtTokenFromSession);
             if (string.IsNullOrEmpty(jwt))
             {
-                return RedirectToAction("Login2", "Auth", new { returnUrl = "/User/Edit/" + id });
+                return RedirectToAction("Login", "Auth", new { returnUrl = "/User/Edit/" + id });
             }
 
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
@@ -158,7 +158,7 @@ namespace meeplematch_web.Controllers
 
             if (string.IsNullOrEmpty(jwt))
             {
-                return RedirectToAction("Login2", "Auth", new { returnUrl = $"/User/Details/{id}" });
+                return RedirectToAction("Login", "Auth", new { returnUrl = $"/User/Details/{id}" });
             }
 
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
@@ -186,7 +186,7 @@ namespace meeplematch_web.Controllers
 
             if (string.IsNullOrEmpty(jwt))
             {
-                return RedirectToAction("Login2", "Auth", new { returnUrl = $"/User/Delete/{id}" });
+                return RedirectToAction("Login", "Auth", new { returnUrl = $"/User/Delete/{id}" });
             }
 
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
