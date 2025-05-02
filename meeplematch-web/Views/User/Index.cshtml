@@ -1,0 +1,163 @@
+﻿@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">All Users</h2>
+        <a href="/User/Create" class="btn btn-success btn-md">+ Add User</a>
+    </div>
+
+    <div class="mb-4">
+        <div class="row g-2 align-items-end">
+            <div class="col">
+                <div class="row g-2">
+                    <div class="col-lg">
+                        <input type="text" id="searchUsername" class="form-control form-control-sm" placeholder="Username" />
+                    </div>
+                    <div class="col-lg">
+                        <input type="text" id="searchEmail" class="form-control form-control-sm" placeholder="Email" />
+                    </div>
+                    <div class="col-lg">
+                        <select id="searchRole" class="form-select form-select-sm">
+                            <option value="">Role</option>
+                            <option value="1">User</option>
+                            <option value="2">Admin</option>
+                        </select>
+                    </div>
+                    <div class="col-lg">
+                        <select id="searchGender" class="form-select form-select-sm">
+                            <option value="">Gender</option>
+                            <option value="true">Male</option>
+                            <option value="false">Female</option>
+                        </select>
+                    </div>
+                    <div class="col-lg">
+                        <select id="searchBanned" class="form-select form-select-sm">
+                            <option value="">Banned?</option>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <button id="resetFilters" class="btn btn-sm btn-secondary">Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="userList">
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            const token = sessionStorage.getItem('jwtToken');
+            const userList = document.getElementById('userList');
+            let allUsers = [];
+
+            if (!token) {
+                window.location.href = '/Auth/Login2?returnUrl=/User/Index';
+                return;
+            }
+
+            try {
+                const storeRes = await fetch('/User/StoreToken', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(token)
+                });
+
+                if (!storeRes.ok) throw new Error('Token not stored');
+
+            } catch (error) {
+                console.error('Failed to store JWT on server session:', error);
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5202/api/meeplematch/user', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Unauthorized');
+
+                allUsers = await response.json();
+                renderUsers(allUsers);
+            } catch (err) {
+                console.error('Error fetching users', err);
+                window.location.href = '/Auth/Login?returnUrl=/User/Index';
+            }
+
+            const inputs = ['searchUsername', 'searchEmail', 'searchRole', 'searchGender', 'searchBanned'];
+            inputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', filterUsers);
+            });
+
+            document.getElementById('resetFilters').addEventListener('click', function () {
+                document.getElementById('searchUsername').value = '';
+                document.getElementById('searchEmail').value = '';
+                document.getElementById('searchRole').value = '';
+                document.getElementById('searchGender').value = '';
+                document.getElementById('searchBanned').value = '';
+                renderUsers(allUsers); 
+            });
+
+            function filterUsers() {
+                const username = document.getElementById('searchUsername').value.toLowerCase();
+                const email = document.getElementById('searchEmail').value.toLowerCase();
+                const role = document.getElementById('searchRole').value;
+                const gender = document.getElementById('searchGender').value;
+                const banned = document.getElementById('searchBanned').value;
+
+                const filtered = allUsers.filter(user => {
+                    return (!username || user.username.toLowerCase().includes(username)) &&
+                        (!email || user.email.toLowerCase().includes(email)) &&
+                        (!role || user.roleId.toString() === role) &&
+                        (!gender || user.isMale?.toString() === gender) &&
+                        (!banned || user.isBanned?.toString() === banned);
+                });
+
+                renderUsers(filtered);
+            }
+
+            function renderUsers(users) {
+                userList.innerHTML = '';
+                users.forEach(user => {
+                    const card = document.createElement('div');
+                    card.className = 'one-card col-12 col-md-6 col-lg-3 mb-4';
+                    const imagePath = user.imagePath || (user.isMale ? '/assets/images/placeholder_man_profile_pic.jpg' : '/assets/images/placeholder_woman_profile_pic.jpg');
+
+                    card.innerHTML = `
+                        <div class="card shadow-sm text-dark h-100">
+                            <img src="${imagePath}" class="card-img-top" alt="Profile picture of ${user.username}" style="object-fit: contain; height: 200px; width: 100%; background-color: #f8f9fa;">
+                            <div class="card-body">
+                                <h5 class="card-title">${user.firstName ?? ''} ${user.lastName ?? ''}</h5>
+                                <h6 class="card-subtitle mb-1 text-muted mb-2">${user.username}</h6>
+                                <p class="card-text">
+                                    Role: ${user.roleId === 2 ? 'Admin' : 'User'}<br/>
+                                    E-mail: ${user.email}<br/>
+                                    Gender: ${user.isMale === null ? 'Not set' : user.isMale ? 'Male' : 'Female'}<br/>
+                                    Banned: ${user.isBanned ? 'Yes' : 'No'}<br/>
+                                    Profile Created: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}
+                                </p>
+                                <div class="text-center">
+                                    <a href="/User/Details/${user.idUser}" class="btn btn-sm btn-outline-primary">Details</a>
+                                    <a href="/User/Edit/${user.idUser}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <a href="/User/Delete/${user.idUser}" class="btn btn-sm btn-outline-danger">Delete</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    userList.appendChild(card);
+                });
+            }
+        });
+    </script>
+}

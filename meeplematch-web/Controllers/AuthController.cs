@@ -11,26 +11,22 @@ namespace meeplematch_web.Controllers
 {
     public class AuthController : Controller
     {
-        //private readonly IAuthService _authService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly string apiUrl = "auth";
-        //public AuthController(IAuthService authService)
-        //{
-        //    _authService = authService;
-        //}
         public AuthController(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }
 
         [HttpGet]
-        public ActionResult Login()
+        public ActionResult Login2(string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
+        public async Task<IActionResult> Login2(string username, string password, string? returnUrl = null)
         {
             var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
             var response = await httpClient.GetAsync($"{apiUrl}/login?username={username}&password={password}");
@@ -42,22 +38,13 @@ namespace meeplematch_web.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                //Constants.JwtToken = content;
-                //HttpContext context = HttpContext.Connection.Cur
-                //HttpContext.Session.Set
-                HttpContext.Session.SetString(Constants.JwtTokenFromSession, content);
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                ViewData["JwtToken"] = content;
+                ViewData["ReturnUrl"] = returnUrl ?? Url.Action("Index", "Home");
+
+                return View("LoginSuccess");
+
             }
-
             return View();
-            //var result = await _authService.LoginAsync(username, password);
-            //if (result == null)
-            //{
-            //    ViewData["Error"] = "Invalid credentials";
-            //    return View();
-            //}
-
-            //return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
@@ -86,19 +73,18 @@ namespace meeplematch_web.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var contentResponse = await response.Content.ReadAsStringAsync();
-                //Constants.JwtToken = contentResponse;
                 HttpContext.Session.SetString(Constants.JwtTokenFromSession, contentResponse);
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
-            //var dto = new RegisterDTO { Username = username, Email = email, Password = password, RoleId = 1 };
-            //var result = await _authService.RegisterAsync(dto);
-            //if (result == null)
-            //{
-            //    ViewData["Error"] = "Registration failed";
-            //    return View("Login");
-            //}
-
             return View();
         }
+
+        [HttpGet]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear(); 
+            return RedirectToAction("Login2", "Auth");
+        }
+
     }
 }
