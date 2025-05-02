@@ -1,5 +1,7 @@
-﻿using meeplematch_web.Utils;
+﻿using meeplematch_web.Models;
+using meeplematch_web.Utils;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text.Json;
@@ -42,10 +44,18 @@ namespace meeplematch_web.Controllers
                 var content = await response.Content.ReadAsStringAsync();
                 HttpContext.Session.SetString(Constants.JwtTokenFromSession, content);
 
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", content);
+
+                var pubilcUser = await (await httpClient.GetAsync($"user/public/{username}")).Content.ReadAsAsync<PublicUserViewModel>();
+                var user = await (await httpClient.GetAsync($"user/{pubilcUser.IdUser}")).Content.ReadAsAsync<UserViewModel>();
+                //var users = await user.Content.ReadAsAsync<List<UserViewModel>>();
+                //var userContent = users.FirstOrDefault();
+                string role = user.RoleId == 1 ? "User" : "Admin";
+
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, username),
-                    new Claim(ClaimTypes.Role, "User")
+                    new Claim(ClaimTypes.Role, role)
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");

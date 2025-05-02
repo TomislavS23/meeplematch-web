@@ -16,6 +16,6 @@
 
         public virtual EventViewModel Event { get; set; } = null!;
 
-        public virtual UserViewModel User { get; set; } = null!;
+        public virtual PublicUserViewModel User { get; set; } = null!;
     }
 }

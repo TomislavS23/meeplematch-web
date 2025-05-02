@@ -1,4 +1,5 @@
-@model meeplematch_web.Models.EventViewModel
+@* @model meeplematch_web.Models.EventViewModel *@
+@model meeplematch_web.Models.EventWithCommentsViewModel
 @{
     ViewData["Title"] = "Details";
 }
@@ -8,37 +9,64 @@
 
     <div class="row justify-content-center align-items-center mb-4">
         <div class="col-md-4">
-            <img src="@(!string.IsNullOrEmpty(Model.ImagePath) ? Model.ImagePath : Url.Content("~/assets/images/game_night_placeholder.png"))"
-                    alt="Event Image" class="img-thumbnail shadow"
-                    style="width: 100%; max-width: 400px; height: 300px; object-fit: cover;" />
+            <img src="@(!string.IsNullOrEmpty(Model.Event.ImagePath) ? Model.Event.ImagePath : Url.Content("~/assets/images/game_night_placeholder.png"))"
+            alt="Event Image" class="img-thumbnail shadow"
+            style="width: 100%; max-width: 400px; height: 300px; object-fit: cover;" />
         </div>
 
         <div class="col-md-6 text-center">
-            <div class="mb-2"><strong>Title:</strong> @Model.Name</div>
-            <div class="mb-2"><strong>Game:</strong> @Model.Game</div>
-            <div class="mb-2"><strong>Type:</strong> @Model.Type</div>
-            <div class="mb-2"><strong>Location:</strong> @Model.Location</div>
-            <div class="mb-2"><strong>Date & Time:</strong> @Model.EventDate.ToString("f")</div>
-            <div class="mb-2"><strong>Min Participants:</strong> @Model.MinParticipants</div>
-            <div class="mb-2"><strong>Max Participants:</strong> @Model.Capacity</div>
-            <div class="mb-2"><strong>Created By:</strong> @(Model.CreatedByNavigation?.Username ?? "Unknown")</div>
+            <div class="mb-2"><strong>Title:</strong> @Model.Event.Name</div>
+            <div class="mb-2"><strong>Game:</strong> @Model.Event.Game</div>
+            <div class="mb-2"><strong>Type:</strong> @Model.Event.Type</div>
+            <div class="mb-2"><strong>Location:</strong> @Model.Event.Location</div>
+            <div class="mb-2"><strong>Date & Time:</strong> @Model.Event.EventDate.ToString("f")</div>
+            <div class="mb-2"><strong>Min Participants:</strong> @Model.Event.MinParticipants</div>
+            <div class="mb-2"><strong>Max Participants:</strong> @Model.Event.Capacity</div>
+            <div class="mb-2"><strong>Created By:</strong> @(Model.Event.CreatedByNavigation?.Username ?? "Unknown")</div>
         </div>
     </div>
 
-    @if (!string.IsNullOrWhiteSpace(Model.Description))
-    {
-        <div class="row justify-content-center mb-4">
-            <div class="col-md-8">
-                <h5 class="text-center">Description</h5>
-                <div class="p-3">
-                    @Html.Raw(Model.Description.Replace("\n", "<br />"))
+    @{
+        if (!string.IsNullOrWhiteSpace(Model.Event.Description))
+        {
+            <div class="row justify-content-center mb-4">
+                <div class="col-md-8">
+                    <h5 class="text-center">Description</h5>
+                    <div class="p-3">
+                        @Html.Raw(Model.Event.Description.Replace("\n", "<br />"))
+                    </div>
                 </div>
             </div>
-        </div>
+        }
     }
 
     <div class="text-center mt-4">
-        <a asp-action="Edit" asp-route-id="@Model.IdEvent" class="btn btn-info">Edit</a>
+        @if (User.Identity.IsAuthenticated && User.Identity.Name.Equals(Model.Event.CreatedByNavigation?.Username))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Event.IdEvent" class="btn btn-info">Edit</a>
+        }
         <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
     </div>
+</div>
+
+<div class="container my-5">
+    <h4 class="mb-4">Comments</h4>
+    @await Html.PartialAsync("../EventComment/_EventCommentsPartial", Model.Comments)
+    <br />
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h5 class="mb-4">Add a Comment</h5>
+        <form asp-controller="EventComment" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+        <input type="hidden" name="EventId" value="@Model.Event.IdEvent" />
+        <div class="form-group">
+            <label for="Comment" class="form-label mb-2">Comment</label>
+            <textarea name="Comment" class="form-control mb-2" rows="3" placeholder="Write your comment here..."></textarea>
+            <span class="text-danger field-validation-valid" data-valmsg-for="Comment" data-valmsg-replace="true"></span>
+        </div>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button type="submit" class="btn btn-primary mb-2">Post Comment</button>
+        </div>
+        </form>
+    }
 </div>
