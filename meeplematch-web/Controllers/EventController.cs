@@ -5,6 +5,9 @@ using System.Text.Json;
 using System.Text;
 using static System.Net.Mime.MediaTypeNames;
 using meeplematch_web.Utils;
+using System.Net.Http;
+using System.Linq;
+using System.Security.Claims;
 
 namespace meeplematch_web.Controllers
 {
@@ -43,8 +46,6 @@ namespace meeplematch_web.Controllers
 
                 foreach (var ev in pagedEvents)
                 {
-                    // Fix required: no need for authentication to view organizer's name
-                    //httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Constants.JwtToken);
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString(Constants.JwtTokenFromSession));
                     var userResult = httpClient.GetAsync($"user/public/{ev.CreatedBy}").Result;
                     if (userResult.IsSuccessStatusCode)
@@ -77,23 +78,51 @@ namespace meeplematch_web.Controllers
         }
 
         // GET: EventController/Details/5
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
             var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
-            HttpResponseMessage response = httpClient.GetAsync($"{apiUri}/{id}").Result;
+            HttpResponseMessage response = await httpClient.GetAsync($"{apiUri}/{id}");
             if (response.IsSuccessStatusCode)
             {
-                var @event = response.Content.ReadAsAsync<EventViewModel>().Result;
+                var @event = await response.Content.ReadAsAsync<EventViewModel>();
                 if (@event.CreatedBy != 0)
                 {
-                    HttpResponseMessage userResponse = httpClient.GetAsync($"user/public/{@event.CreatedBy}").Result;
+                    HttpResponseMessage userResponse = await httpClient.GetAsync($"user/public/{@event.CreatedBy}");
                     if (userResponse.IsSuccessStatusCode)
                     {
-                        var user = userResponse.Content.ReadAsAsync<PublicUserViewModel>().Result;
+                        var user = await userResponse.Content.ReadAsAsync<PublicUserViewModel>();
                         @event.CreatedByNavigation = _mapper.Map<PublicUserViewModel>(user ?? new PublicUserViewModel { Username = "Unknown" });
                     }
                 }
-                return View(@event);
+
+                var commentsResponse = await httpClient.GetAsync($"event-comment/{id}");
+                List<EventCommentViewModel> comments = new();
+                if (commentsResponse.IsSuccessStatusCode)
+                {
+                    comments = await commentsResponse.Content.ReadAsAsync<List<EventCommentViewModel>>();
+                    foreach (var comment in comments)
+                    {
+                        HttpResponseMessage userResponse = await httpClient.GetAsync($"user/public/{comment.UserId}");
+                        if (userResponse.IsSuccessStatusCode)
+                        {
+                            var user = await userResponse.Content.ReadAsAsync<PublicUserViewModel>();
+                            comment.User = _mapper.Map<PublicUserViewModel>(user ?? new PublicUserViewModel { Username = "Unknown" });
+                        }
+                        comment.Event = @event;
+                    }
+                }
+
+                var viewModel = new EventWithCommentsViewModel
+                {
+                    Event = @event,
+                    Comments = comments,
+                    NewComment = new EventCommentViewModel
+                    {
+                        EventId = id
+                    }
+                };
+
+                return View(viewModel);
             }
             TempData["toast_error"] = "Event not found";
             return NotFound();
@@ -149,61 +178,11 @@ namespace meeplematch_web.Controllers
                 viewModel.ImagePath = $"/assets/pic_uploads/{uniqueFileName}";
             }
 
-            // The following is a test
-            // TODO: CreatedBy should be set to the logged-in user
-            //var jwtToken = HttpContext.Session.GetString(Constants.JwtTokenFromSession);
-            //var token = new JwtSecurityToken();
-            //if (jwtToken is not null)
-            //{
-            //    token = JwtUtils.ConvertJwtStringToJwtSecurityToken(jwtToken);
-            //}
-            //else
-            //{
-            //    TempData["toast_error"] = "You are not authenticated!";
-            //    return View(viewModel);
-            //}
-            //var payload = JwtUtils.DecodeJwt(token);
-
-            //var username = payload.FirstOrDefault(x => x.Key.Contains("name")).Value.ToString();
-
-            //Console.WriteLine(username);
-
-
             var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
-            var jwtToken = HttpContext.Session.GetString(Constants.JwtTokenFromSession);
 
-            if (string.IsNullOrEmpty(jwtToken))
-            {
-                TempData["toast_error"] = "Authentication error!";
-                _logger.LogError("JWT token is null or empty");
-                return View(viewModel);
-            }
+            var userResult = await httpClient.GetAsync($"user/public/{username}");
+            var user = await userResult.Content.ReadAsAsync<PublicUserViewModel>();
 
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwtToken);
-
-            //if (httpClient.DefaultRequestHeaders.Authorization == null)
-            //{
-            //    TempData["toast_error"] = "You are not authenticated!";
-            //    _logger.LogError("Authorization header is null");
-            //}
-            //else
-            //{
-            //    _logger.LogInformation($"Authorization header: {httpClient.DefaultRequestHeaders.Authorization}");
-            //}
-
-
-
-            var usersResult = await httpClient.GetAsync($"user/");
-            if (!usersResult.IsSuccessStatusCode)
-            {
-                TempData["toast_error"] = "Failed to retrieve user information.";
-                _logger.LogError("Failed to retrieve user information.");
-                return View(viewModel);
-            }
-
-            var user = (await usersResult.Content.ReadAsAsync<List<PublicUserViewModel>>()).FirstOrDefault(u => u.Username.Equals(username));
-
-            //viewModel.CreatedBy = 1;
             if (user == null)
             {
                 TempData["toast_error"] = "User not found.";
@@ -247,7 +226,7 @@ namespace meeplematch_web.Controllers
         // POST: EventController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, EventViewModel viewModel, IFormFile? image)
+        public async Task<IActionResult> Edit(int id, EventViewModel viewModel, IFormFile? image)
         {
             if (!ModelState.IsValid)
             {
@@ -256,8 +235,20 @@ namespace meeplematch_web.Controllers
             }
 
             var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
-            var existingEventResponse = httpClient.GetAsync($"{apiUri}/{id}").Result;
-            var existingEvent = existingEventResponse.Content.ReadAsAsync<EventViewModel>().Result;
+            var existingEventResponse = await httpClient.GetAsync($"{apiUri}/{id}");
+            var existingEvent = await existingEventResponse.Content.ReadAsAsync<EventViewModel>();
+
+            var userEditing = await (await httpClient.GetAsync($"user/public/{User.Identity.Name}")).Content.ReadAsAsync<PublicUserViewModel>();
+
+            if (userEditing.IdUser != existingEvent.CreatedBy && !User.IsInRole("Admin"))
+            {
+                TempData["toast_error"] = "An error occured while validating the user.";
+                if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Testing")
+                {
+                    return BadRequest("Current user does not equal the original user");
+                }
+                return RedirectToAction(nameof(Index));
+            }
 
             if (image != null && image.Length > 0)
             {
@@ -331,10 +322,22 @@ namespace meeplematch_web.Controllers
         // POST: EventController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete2(int id, EventViewModel eventDTO)
+        public async Task<IActionResult> Delete2(int id, EventViewModel eventDTO)
         {
             var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
-            var response = httpClient.DeleteAsync($"{apiUri}/{id}").Result;
+
+            var userDeleting = await (await httpClient.GetAsync($"user/public/{User.Identity.Name}")).Content.ReadAsAsync<PublicUserViewModel>();
+            if (userDeleting.IdUser != eventDTO.CreatedBy && !User.IsInRole("Admin"))
+            {
+                TempData["toast_error"] = "An error occured while validating the user.";
+                if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Testing")
+                {
+                    return BadRequest("Current user does not equal the original user");
+                }
+                return RedirectToAction(nameof(Index));
+            }
+
+            var response = await httpClient.DeleteAsync($"{apiUri}/{id}");
             if (response.IsSuccessStatusCode)
             {
                 TempData["toast_success"] = "Event deleted successfully!";

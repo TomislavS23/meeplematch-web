@@ -38,7 +38,7 @@ namespace meeplematch_web.Models
         [Display(Name = "Updated At")]
         public DateTime? UpdatedAt { get; set; }
 
-        public string? Description { get; set; }
+        public string Description { get; set; } = null!;
         public string? ImagePath { get; set; }
 
         [ValidateNever]
