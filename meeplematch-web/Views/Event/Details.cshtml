@@ -1,5 +1,5 @@
 @* @model meeplematch_web.Models.EventViewModel *@
-@model meeplematch_web.Models.EventWithCommentsViewModel
+@model meeplematch_web.Models.EventWithCommentsAndParticipantsViewModel
 @{
     ViewData["Title"] = "Details";
 }
@@ -32,7 +32,7 @@
             <div class="row justify-content-center mb-4">
                 <div class="col-md-8">
                     <h5 class="text-center">Description</h5>
-                    <div class="p-3">
+                    <div class="p-3 text-center">
                         @Html.Raw(Model.Event.Description.Replace("\n", "<br />"))
                     </div>
                 </div>
@@ -46,12 +46,38 @@
             <a asp-action="Edit" asp-route-id="@Model.Event.IdEvent" class="btn btn-info">Edit</a>
         }
         <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
+        @if (User.Identity.IsAuthenticated)
+        {
+            if (!(bool)(Model.Participants.FirstOrDefault(e => e.Username.Equals(User.Identity.Name))?.IsJoined ?? false))
+            {
+            <form asp-controller="EventParticipant" asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="eventId" value="@Model.Event.IdEvent" />
+                    <button type="submit" class="btn btn-success mt-3 p-3 ps-5 pe-5">Join Event</button>
+            </form>
+            }
+            else
+            {
+                <form asp-controller="EventParticipant" asp-action="DeleteUserFromEvent" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="eventId" value="@Model.Event.IdEvent" />
+                    <input type="hidden" name="userId" value="@Model.Participants.FirstOrDefault(e => e.Username.Equals(User.Identity.Name))?.IdUser" />
+                    <button type="submit" class="btn btn-success mt-3 p-3 ps-5 pe-5">Already Joined</button>
+                </form>
+            }
+        }
+        @if (User.Identity.IsAuthenticated && User.Identity.Name.Equals(Model.Event.CreatedByNavigation?.Username))
+        {
+            <br />
+            <h4 class="mb-4">Users joined</h4>
+            @await Html.PartialAsync("../EventParticipant/_EventParticipantPartial", Model.Participants)
+        }
     </div>
 </div>
 
 <div class="container my-5">
     <h4 class="mb-4">Comments</h4>
-    @await Html.PartialAsync("../EventComment/_EventCommentsPartial", Model.Comments)
+    @await Html.PartialAsync("../EventComment/_EventCommentsPartial", Model.Comments, ViewData)
     <br />
     @if (User.Identity.IsAuthenticated)
     {
@@ -70,3 +96,48 @@
         </form>
     }
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var editModal = document.getElementById('editCommentModal');
+            var editForm = document.getElementById('editCommentForm');
+
+            editModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                document.getElementById('editCommentId').value = button.getAttribute('data-id');
+                document.getElementById('editEventId').value = button.getAttribute('data-event-id');
+                document.getElementById('editCommentText').value = button.getAttribute('data-comment');
+                editForm.action = `/EventComment/Edit?eventId=${button.getAttribute('data-event-id')}&eventCommentId=${button.getAttribute('data-id')}`;
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var deleteModal = document.getElementById('deleteCommentModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                document.getElementById('deleteCommentId').value = button.getAttribute('data-comment-id');
+                document.getElementById('deleteEventId').value = button.getAttribute('data-event-id');
+                document.getElementById('deleteUsername').textContent = button.getAttribute('data-username');
+                document.getElementById('deleteCommentText').textContent = button.getAttribute('data-comment');
+                document.getElementById('deleteCreatedAt').textContent = button.getAttribute('data-created');
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var deleteModal = document.getElementById('deleteParticipantModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                if (!button) console.log('no button');
+                document.getElementById('deleteEventId').value = button.getAttribute('data-event-id');
+                document.getElementById('deleteUserId').value = button.getAttribute('data-user-id');
+                document.getElementById('deleteUsername').textContent = button.getAttribute('data-username');
+                document.getElementById('deleteJoinedAt').textContent = new Date(button.getAttribute('data-joined-at')).toLocaleString();
+            });
+        });
+    </script>
+}

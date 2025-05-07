@@ -40,6 +40,7 @@ namespace meeplematch_web.Models
 
         public string Description { get; set; } = null!;
         public string? ImagePath { get; set; }
+        public int NumberOfParticipants { get; set; }
 
         [ValidateNever]
         public virtual PublicUserViewModel CreatedByNavigation { get; set; } = null!;

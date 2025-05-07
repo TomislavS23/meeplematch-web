@@ -18,7 +18,7 @@ namespace meeplematch_web.Controllers
         }
 
         // GET: EventCommentController
-        public async Task<IActionResult> Index(int id)
+        public async Task<IActionResult> Index(int id, int page = 1, int pageSize = 5)
         {
             var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
             var response = await httpClient.GetAsync($"{apiUrl}/{id}");
@@ -27,6 +27,14 @@ namespace meeplematch_web.Controllers
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var comments = JsonSerializer.Deserialize<List<EventCommentViewModel>>(content);
+
+                var pagedComments = comments.OrderBy(c => c.UpdatedAt).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+                ViewBag.CurrentPage = page;
+                ViewBag.TotalPages = (int)Math.Ceiling((double)comments.Count / pageSize);
+                //TempData["CurrentPage"] = page;
+                //TempData["TotalPages"] = (int)Math.Ceiling((double)comments.Count / pageSize);
+
                 return View(comments);
             }
             else
