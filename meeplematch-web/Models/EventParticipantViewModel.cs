@@ -10,6 +10,9 @@
 
         public DateTime? JoinedAt { get; set; }
 
+        public bool? IsJoined { get; set; }
+        public string? Username { get; set; }
+
         public virtual EventViewModel IdEventNavigation { get; set; } = null!;
 
         public virtual UserViewModel IdUserNavigation { get; set; } = null!;

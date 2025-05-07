@@ -8,6 +8,8 @@ using meeplematch_web.Utils;
 using System.Net.Http;
 using System.Linq;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Drawing.Printing;
 
 namespace meeplematch_web.Controllers
 {
@@ -46,6 +48,9 @@ namespace meeplematch_web.Controllers
 
                 foreach (var ev in pagedEvents)
                 {
+                    var participants = httpClient.GetAsync($"event-participant/{ev.IdEvent}").Result.Content.ReadAsAsync<List<EventParticipantViewModel>>().Result;
+                    ev.NumberOfParticipants = participants.Count();
+
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString(Constants.JwtTokenFromSession));
                     var userResult = httpClient.GetAsync($"user/public/{ev.CreatedBy}").Result;
                     if (userResult.IsSuccessStatusCode)
@@ -78,7 +83,7 @@ namespace meeplematch_web.Controllers
         }
 
         // GET: EventController/Details/5
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id, int page = 1, int pageSize = 5)
         {
             var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
             HttpResponseMessage response = await httpClient.GetAsync($"{apiUri}/{id}");
@@ -97,6 +102,7 @@ namespace meeplematch_web.Controllers
 
                 var commentsResponse = await httpClient.GetAsync($"event-comment/{id}");
                 List<EventCommentViewModel> comments = new();
+                List<EventCommentViewModel> pagedComments = new();
                 if (commentsResponse.IsSuccessStatusCode)
                 {
                     comments = await commentsResponse.Content.ReadAsAsync<List<EventCommentViewModel>>();
@@ -110,19 +116,39 @@ namespace meeplematch_web.Controllers
                         }
                         comment.Event = @event;
                     }
+
+                    pagedComments = comments.OrderByDescending(c => c.UpdatedAt).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+                    ViewData["CurrentPage"] = page;
+                    ViewData["TotalPages"] = (int)Math.Ceiling((double)comments.Count / pageSize);
                 }
 
-                var viewModel = new EventWithCommentsViewModel
+                var participants = await (await httpClient.GetAsync($"event-participant/{id}")).Content.ReadAsAsync<List<EventParticipantViewModel>>();
+                if (User.Identity.IsAuthenticated)
+                {
+
+                    foreach (var ev in participants)
+                    {
+                        //var user = await (await httpClient.GetAsync($"user/public/{User.Identity.Name}")).Content.ReadAsAsync<PublicUserViewModel>();
+                        var user = await (await httpClient.GetAsync($"user/public/{ev.IdUser}")).Content.ReadAsAsync<PublicUserViewModel>();
+                        ev.Username = user.Username;
+
+                        if (ev.IdUser == user.IdUser) ev.IsJoined = true;
+                        else ev.IsJoined = false;
+                    }
+                }
+
+                var viewModel = new EventWithCommentsAndParticipantsViewModel
                 {
                     Event = @event,
-                    Comments = comments,
+                    Comments = pagedComments,
+                    Participants = participants,
                     NewComment = new EventCommentViewModel
                     {
                         EventId = id
                     }
                 };
 
-                return View(viewModel);
+                    return View(viewModel);
             }
             TempData["toast_error"] = "Event not found";
             return NotFound();
@@ -285,7 +311,7 @@ namespace meeplematch_web.Controllers
             if (response.IsSuccessStatusCode)
             {
                 TempData["toast_success"] = "Event updated successfully!";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = id });
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {

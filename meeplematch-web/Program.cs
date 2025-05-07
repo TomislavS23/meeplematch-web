@@ -39,7 +39,7 @@ public partial class Program
             //string apiUrl = "https://localhost:7230/api/meeplematch/";
             httpClient.BaseAddress = new Uri(apiUrl);
         });
-
+        
         builder.Services.AddAuthentication("MyCookieAuth").AddCookie("MyCookieAuth", options =>
             {
                 options.LoginPath = "/Auth/Login";
