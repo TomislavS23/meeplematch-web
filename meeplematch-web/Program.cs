@@ -16,7 +16,7 @@ public partial class Program
 
         builder.Services.AddSession(options =>
         {
-            options.IdleTimeout = TimeSpan.FromSeconds(10);
+            options.IdleTimeout = TimeSpan.FromMinutes(30);
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
         });
@@ -33,6 +33,7 @@ public partial class Program
         //builder.Services.AddDbContext<MeepleMatchContext>(
         //    options => options.UseNpgsql(Constants.PsqlConnectionString));
 
+        builder.Services.AddHttpContextAccessor();
         builder.Services.AddHttpClient(Constants.ApiName, httpClient =>
         {
             string apiUrl = "http://localhost:5202/api/meeplematch/";
