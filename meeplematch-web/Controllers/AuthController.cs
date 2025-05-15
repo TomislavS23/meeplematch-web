@@ -61,7 +61,8 @@ namespace meeplematch_web.Controllers
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, username),
-                    new Claim(ClaimTypes.Role, role)
+                    new Claim(ClaimTypes.Role, role),
+                    new Claim("avatar", user.ImagePath ?? "/assets/images/neutral_profile.png")
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
@@ -115,7 +116,8 @@ namespace meeplematch_web.Controllers
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, username),
-                    new Claim(ClaimTypes.Role, "User")
+                    new Claim(ClaimTypes.Role, "User"),
+                    new Claim("avatar", "/assets/images/neutral_profile.png")
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
@@ -136,9 +138,10 @@ namespace meeplematch_web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            HttpContext.Session.Clear(); 
+            await HttpContext.SignOutAsync("MyCookieAuth"); 
+            HttpContext.Session.Clear();
             return RedirectToAction("Login", "Auth");
         }
 

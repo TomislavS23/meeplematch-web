@@ -1,0 +1,83 @@
+﻿@model meeplematch_web.Models.UserEventsViewModel
+
+@{
+    ViewData["Title"] = "My Events";
+}
+
+<div class="container my-5">
+    <h2 class="mb-4">Events I’m Registered For</h2>
+
+    @if (!Model.RegisteredEvents.Any())
+    {
+        <div class="alert alert-warning w-25">You're not registered for any events yet.</div>
+    } else {
+        <div class="row g-4 mb-5">
+            @foreach (var item in Model.RegisteredEvents)
+            {
+                <div class="one-card col-12 col-sm-6 col-lg-3">
+                    <div class="card h-100 shadow-sm" data-aos="flip-right" data-aos-duration="1500">
+                        <img src="@(!string.IsNullOrEmpty(item.ImagePath) ? item.ImagePath : Url.Content("~/assets/images/game_night_placeholder.png"))"
+                             class="card-img-top event-img" />
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-black">@item.Name</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                @item.EventDate.ToString("ddd, dd MMMM - HH:mm") h
+                            </h6>
+                            <p class="card-text mb-1 text-black">
+                                <strong>Hosted by:</strong> @(item.CreatedByNavigation?.Username ?? "Unknown")
+                            </p>
+                            <p class="card-text text-muted" style="font-size: 0.875rem;">
+                                Game: @item.Game<br />
+                                Type: @item.Type<br />
+                                Location: @item.Location
+                            </p>
+                            <p class="mt-auto text-black">
+                                <strong>@item.NumberOfParticipants/@item.Capacity</strong> players registered
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <h2 class="mb-4">Events I Created</h2>
+
+    @if (!Model.CreatedEvents.Any())
+    {
+        <div class="alert alert-warning w-25">You haven't created any events yet.</div>
+    }
+    else
+    {
+        <div class="row g-4 mb-5">
+            @foreach (var item in Model.CreatedEvents)
+            {
+                <div class="one-card col-12 col-sm-6 col-lg-3">
+                    <div class="card h-100 shadow-sm" data-aos="flip-right" data-aos-duration="1500">
+                        <img src="@(!string.IsNullOrEmpty(item.ImagePath) ? item.ImagePath : Url.Content("~/assets/images/game_night_placeholder.png"))"
+                                class="card-img-top event-img" />
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-black">@item.Name</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                @item.EventDate.ToString("ddd, dd MMMM - HH:mm") h
+                            </h6>
+                            <p class="card-text mb-1 text-black">
+                                <strong>Hosted by:</strong> @(item.CreatedByNavigation?.Username ?? "Unknown")
+                            </p>
+                            <p class="card-text text-muted" style="font-size: 0.875rem;">
+                                Game: @item.Game<br />
+                                Type: @item.Type<br />
+                                Location: @item.Location
+                            </p>
+                            <p class="mt-auto text-black">
+                                <strong>@item.NumberOfParticipants/@item.Capacity</strong> players registered
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

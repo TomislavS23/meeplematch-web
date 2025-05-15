@@ -11,6 +11,7 @@ namespace meeplematch_web.Mapping
             CreateMap<EventDTO, EventViewModel>().ReverseMap();
             CreateMap<UserDTO, UserViewModel>().ReverseMap();
             CreateMap<PublicUserDTO, UserViewModel>().ReverseMap();
+            
         }
     }
 }

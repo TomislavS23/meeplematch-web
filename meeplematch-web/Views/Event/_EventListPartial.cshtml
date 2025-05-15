@@ -13,7 +13,7 @@
                     @item.EventDate.ToString("ddd, dd MMMM - HH:mm") h
                 </h6>
                 <p class="card-text mb-1 text-black">
-                    @* <strong>Hosted by:</strong> @(item.CreatedByNavigation?.Username ?? "Unknown") *@
+                    <strong>Hosted by:</strong> @(item.CreatedByNavigation?.Username ?? "Unknown") 
                 </p>
                 <p class="card-text text-muted" style="font-size: 0.875rem;">
                     Game: @item.Game<br />
@@ -21,12 +21,16 @@
                     Location: @item.Location
                 </p>
                 <p class="mt-auto text-black">
-                    <strong>4464/@item.Capacity</strong> players registered @* number of signed up players needed  *@
+                    <strong>@item.NumberOfParticipants/@item.Capacity</strong> players registered
                 </p>
                 <div class="mt-2 text-center">
                     <a asp-action="Details" asp-route-id="@item.IdEvent" class="btn btn-sm btn-outline-primary">Details</a>
-                    <a asp-action="Edit" asp-route-id="@item.IdEvent" class="btn btn-sm btn-outline-secondary">Edit</a>
-                    <a class="btn btn-sm btn-outline-danger" href="/Event/Delete/@item.IdEvent">Delete</a>
+
+                    @if (User.Identity.IsAuthenticated && User.Identity.Name.Equals(item.CreatedByNavigation?.Username))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.IdEvent" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <a class="btn btn-sm btn-outline-danger" href="/Event/Delete/@item.IdEvent">Delete</a>
+                    }
                 </div>
             </div>
         </div>
