@@ -10,6 +10,8 @@ using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Drawing.Printing;
+using QRCoder;
+using Microsoft.AspNetCore.Authorization;
 
 namespace meeplematch_web.Controllers
 {
@@ -148,7 +150,12 @@ namespace meeplematch_web.Controllers
                     }
                 };
 
-                    return View(viewModel);
+                if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Testing")
+                {
+                    return Ok(viewModel);
+                }
+
+                return View(viewModel);
             }
             TempData["toast_error"] = "Event not found";
             return NotFound();
@@ -161,6 +168,7 @@ namespace meeplematch_web.Controllers
         }
 
         // POST: EventController/Create
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(EventViewModel viewModel, IFormFile? image)
@@ -372,7 +380,32 @@ namespace meeplematch_web.Controllers
             else {
                 TempData["toast_error"] = "Event not found";
                 return NotFound();
-            } 
+            }
+        }
+
+        public async Task<IActionResult> GenerateQrCode(int id)
+        {
+            var httpClient = _httpClientFactory.CreateClient(Constants.ApiName);
+            HttpResponseMessage response = await httpClient.GetAsync($"{apiUri}/{id}");
+            if (!response.IsSuccessStatusCode)
+            {
+                TempData["toast_error"] = "Event not found";
+                return NotFound();
+            }
+            var @event = await response.Content.ReadAsAsync<EventViewModel>();
+            var url = Url.Action("Details", "Event", new { id = id }, Request.Scheme);
+            
+            using var qrGenerator = new QRCodeGenerator();
+            using var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+            using var qrCode = new PngByteQRCode(qrCodeData);
+            var bitmap = qrCode.GetGraphic(20);
+
+            var qrCodeImageBase64 = Convert.ToBase64String(bitmap);
+            var qrCodeImageUrl = $"data:image/png;base64,{qrCodeImageBase64}";
+
+            ViewBag.QrCodeImageUrl = qrCodeImageUrl;
+            ViewBag.EventName = @event.Name;
+            return View();
         }
     }
 }
