@@ -2,13 +2,27 @@
 @using Microsoft.AspNetCore.Mvc.Controllers
 
 @{
-    ViewData["Title"] = "Edit User";
     var actionName = (ViewContext.ActionDescriptor as ControllerActionDescriptor)?.ActionName;
+    @if (actionName != "Profile")
+    {
+        ViewData["Title"] = "Edit User";
+    }
+    else
+    {
+        ViewData["Title"] = "User Profile";
+    }
 }
 
 <div class="container my-5">
     <h2 class="mb-4 d-flex justify-content-between align-items-center">
-        <span>Edit User</span>
+        @if (actionName != "Profile")
+        {
+            <span>Edit User</span>
+        }
+        else
+        {
+            <span>User Profile</span>
+        }
     </h2>
 
     <form asp-action="@actionName" method="post" enctype="multipart/form-data">
