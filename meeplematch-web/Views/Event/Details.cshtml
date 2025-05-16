@@ -5,7 +5,10 @@
 }
 
 <div class="container my-5">
-    <h2 class="mb-4">Event Details</h2>
+    <div class="d-flex justify-items-center mb-4">
+        <h2 class="mb-4 me-3">Event Details</h2>
+        <a asp-action="GenerateQrCode" asp-route-id="@Model.Event.IdEvent" class="btn btn-success mb-4">Generate QR</a>
+    </div>
 
     <div class="row justify-content-center align-items-center mb-4">
         <div class="col-md-4">

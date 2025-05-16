@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "Event QR Code";
+}
+
+<div class="container my-5">
+    <div class="text-center">
+        <h2>QR Code for Event @ViewBag.EventId</h2>
+        <br />
+        <img src="@ViewBag.QrCodeImageUrl" alt="QR Code" />
+    </div>
+</div>

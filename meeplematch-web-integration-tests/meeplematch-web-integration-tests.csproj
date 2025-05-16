@@ -8,6 +8,7 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+	<DefineConstants>TESTING</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
