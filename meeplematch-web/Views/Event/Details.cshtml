@@ -69,7 +69,7 @@
                 </form>
             }
         }
-        @if (User.Identity.IsAuthenticated && User.Identity.Name.Equals(Model.Event.CreatedByNavigation?.Username))
+        @if (User.Identity.IsAuthenticated && (User.Identity.Name.Equals(Model.Event.CreatedByNavigation?.Username) || User.IsInRole("Admin")))
         {
             <br />
             <h4 class="mb-4">Users joined</h4>
