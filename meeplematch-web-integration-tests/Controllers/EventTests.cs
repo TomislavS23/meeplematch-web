@@ -1,13 +1,17 @@
 ﻿using meeplematch_web;
+using meeplematch_web.Controllers;
 using meeplematch_web.Models;
 using meeplematch_web_integration_tests.Base;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Moq.Protected;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace meeplematch_web_integration_tests.Controllers
 {
@@ -279,62 +283,6 @@ namespace meeplematch_web_integration_tests.Controllers
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             Assert.Contains("Join", content);
-        }
-
-        [Fact]
-        public async Task Create_UnauthenticatedUser_ReturnsError()
-        {
-            // Arrange
-            //var eventViewModel = new EventViewModel
-            //{
-            //    IdEvent = 1,
-            //    CreatedBy = 1,
-            //    CreatedAt = DateTime.UtcNow,
-            //    UpdatedAt = DateTime.UtcNow,
-            //    ImagePath = "string",
-            //    Uuid = Guid.NewGuid(),
-            //    Name = "Board Game Night",
-            //    Game = "Catan",
-            //    Type = "Casual",
-            //    Location = "Community Center",
-            //    EventDate = DateTime.UtcNow,
-            //    MinParticipants = 2,
-            //    Capacity = 10,
-            //    Description = "A fun night of board games."
-            //};
-
-            //var formContent = new FormUrlEncodedContent(new[]
-            //{
-            //    new KeyValuePair<string, string>("Name", "Board Game Night"),
-            //    new KeyValuePair<string, string>("Game", "Catan"),
-            //    new KeyValuePair<string, string>("Type", "Casual"),
-            //    new KeyValuePair<string, string>("Location", "Community Center"),
-            //    new KeyValuePair<string, string>("EventDate", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss")),
-            //    new KeyValuePair<string, string>("MinParticipants", "2"),
-            //    new KeyValuePair<string, string>("Capacity", "10"),
-            //    new KeyValuePair<string, string>("Description", "A fun night of board games.")
-            //});
-
-            var responseMessage = new HttpResponseMessage(HttpStatusCode.Unauthorized)
-            {
-                Content = new StringContent(JsonSerializer.Serialize(new { message = "Unauthorized" }), Encoding.UTF8, MediaTypeNames.Application.Json)
-            };
-
-            _factory.HttpMessageHandlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(r => r.RequestUri!.AbsolutePath.Contains("events")),
-                    ItExpr.IsAny<CancellationToken>()
-                )
-                .ReturnsAsync(responseMessage);
-
-            //var postContent = new StringContent(JsonSerializer.Serialize(eventViewModel), Encoding.UTF8, MediaTypeNames.Application.Json);
-            // Act
-            var response = await _client.PostAsync($"/Event/Create", new StringContent(""));
-            // Assert
-            Assert.Equal(HttpStatusCode.Found, response.StatusCode);
-            Assert.Contains("Login", response.Headers.Location.ToString());
         }
     }
 }

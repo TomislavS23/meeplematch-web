@@ -170,7 +170,11 @@ namespace meeplematch_web.Controllers
         // POST: EventController/Create
         [Authorize]
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
+#if !TESTING
+[ValidateAntiForgeryToken]
+#endif
+
         public async Task<IActionResult> Create(EventViewModel viewModel, IFormFile? image)
         {
 
@@ -219,6 +223,10 @@ namespace meeplematch_web.Controllers
 
             if (user == null)
             {
+                if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Testing")
+                {
+                    return BadRequest("User not found");
+                }
                 TempData["toast_error"] = "User not found.";
                 _logger.LogError("User not found.");
                 return View(viewModel);

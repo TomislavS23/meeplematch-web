@@ -1,6 +1,8 @@
 ﻿using meeplematch_web.Utils;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -23,10 +25,19 @@ namespace meeplematch_web_integration_tests.Base
                     BaseAddress = new Uri("http://localhost:5202/api/meeplematch/")
                 };
 
+                //services.AddAuthentication("Test").AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
+
+                //services.PostConfigure<MvcOptions>(options =>
+                //{
+                //    options.Filters.Add(new AuthorizeFilter());
+                //});
+
                 var mockFactory = new Mock<IHttpClientFactory>();
                 mockFactory.Setup(x => x.CreateClient(Constants.ApiName)).Returns(client);
                 services.AddSingleton(mockFactory.Object);
             });
+
+            //builder.UseEnvironment("Testing");
         }
     }
 }
